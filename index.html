@@ -1,912 +1,897 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>ESV Grein | Sync-Scroll | Pro Kehre ein Wert</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ESV Grein – Trainingswertung (Querformat)</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            background: linear-gradient(145deg, #0f2e1a 0%, #091f0e 100%);
-            width: 100vw;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Roboto, system-ui, 'Helvetica Neue', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 12px;
-            overflow-x: hidden;
-        }
+    :root {
+      --green: #1f5e3a;
+      --red: #b93a32;
+      --gold: #ffdf8c;
+      --dark: #102417;
+      --light: #eef5e9;
+      --border: #d7e4cf;
+      --radius: 18px;
+      --shadow: 0 8px 24px rgba(0, 0, 0, .25);
+    }
 
-        .dashboard {
-            width: 100%;
-            max-width: 1400px;
-            background: #fefcf5;
-            display: flex;
-            flex-direction: column;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
 
-        .top-bar {
-            background: white;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            border-bottom: 2px solid #deecd2;
-        }
-        h1 {
-            font-size: 1.2rem;
-            background: #eef5e9;
-            padding: 6px 20px;
-            border-radius: 60px;
-            color: #1b4d1b;
-            margin: 0;
-        }
-        .settings-group {
-            display: flex;
-            gap: 10px;
-            background: #f6faf3;
-            padding: 6px 18px;
-            border-radius: 60px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .team-name-input {
-            border: 2px solid #c2d6b8;
-            border-radius: 40px;
-            padding: 8px 12px;
-            font-weight: 600;
-            width: 130px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-        .setting-select {
-            padding: 8px 12px;
-            border-radius: 40px;
-            border: none;
-            background: white;
-            border: 1px solid #bbd4ae;
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-        .apply-btn {
-            background: #2d6a4f;
-            color: white;
-            cursor: pointer;
-            padding: 8px 20px;
-            border-radius: 40px;
-            border: none;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .speech-toggle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #eef3ea;
-            padding: 5px 15px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-        }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(145deg, #17351f, #0d1f13);
+      color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+    }
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr 1fr;
-            gap: 12px;
-            padding: 16px;
-            background: #fefcf5;
-        }
+    .app-wrapper {
+      width: 100%;
+      max-width: 1280px;
+      height: 100vh;
+      max-height: 800px;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(2px);
+      border-radius: var(--radius);
+      padding: 8px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-        /* Sync-Scroll Container */
-        .team-panel {
-            background: #fafdf8;
-            border-radius: 28px;
-            overflow-y: auto;
-            padding: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            max-height: 70vh;
-            scroll-behavior: smooth;
-        }
-        .team-header {
-            font-size: 1.2rem;
-            font-weight: 800;
-            text-align: center;
-            background: #eef3ea;
-            border-radius: 60px;
-            padding: 12px;
-            margin-bottom: 16px;
-            color: #155f2e;
-            position: sticky;
-            top: 0;
-            background: #eef3ea;
-            z-index: 5;
-        }
+    .header {
+      background: var(--green);
+      color: white;
+      padding: 10px 16px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px 12px;
+      flex-shrink: 0;
+    }
 
-        .kehre-card {
-            background: white;
-            border-radius: 28px;
-            margin-bottom: 12px;
-            border: 1px solid #e0ecd6;
-            overflow: hidden;
-            transition: all 0.1s ease;
-        }
-        .kehre-card.played-kehre-bg {
-            background: #ffcdd2 !important;
-            border-left: 8px solid #c62828;
-            box-shadow: 0 2px 8px rgba(198,40,40,0.2);
-        }
-        .kehre-card.current-kehre-bg {
-            background: #c8e6c9 !important;
-            border-left: 8px solid #2e7d32;
-        }
-        .kehre-header {
-            padding: 12px 16px;
-            background: rgba(0,0,0,0.02);
-            border-bottom: 1px solid #e2ecd6;
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: #1b4d1b;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .kehre-header span:first-child {
-            background: #2c7a4d20;
-            padding: 4px 12px;
-            border-radius: 40px;
-        }
-        .punkte-container {
-            padding: 14px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            flex: 2;
-        }
-        .side-punkt {
-            min-width: 56px;
-            min-height: 56px;
-            background: white;
-            border: 2px solid #cbdfc1;
-            border-radius: 60px;
-            font-weight: 800;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: 0.05s linear;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .side-punkt:active { transform: scale(0.94); background: #eef5e8; }
-        .side-value {
-            background: #2c7a4d;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 60px;
-            font-weight: 800;
-            min-width: 80px;
-            text-align: center;
-            font-size: 1.3rem;
-        }
-        .side-del {
-            background: #fef1ec;
-            border: 2px solid #efcdc2;
-            border-radius: 60px;
-            width: 56px;
-            height: 56px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
+    .header h1 {
+      font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
 
-        .center-hero {
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-        }
-        .result-mega {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            align-items: stretch;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .result-card-big {
-            flex: 1;
-            background: #fafef5;
-            border-radius: 40px;
-            padding: 20px 12px;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            border: 2px solid #e2efda;
-        }
-        .result-team-big {
-            font-size: 1.7rem;
-            font-weight: 900;
-            margin-bottom: 10px;
-        }
-        .current-round-big {
-            font-size: 3.8rem;
-            font-weight: 900;
-            margin: 10px 0;
-            color: #1c691c;
-            background: #ecf7e5;
-            border-radius: 80px;
-            padding: 8px;
-        }
-        .games-won-big {
-            font-size: 1rem;
-            background: #e9f2e2;
-            border-radius: 60px;
-            padding: 12px;
-        }
-        .games-number-big {
-            font-size: 2.2rem;
-            font-weight: 800;
-            background: #1b4d1b;
-            color: white;
-            display: inline-block;
-            padding: 6px 24px;
-            border-radius: 60px;
-            min-width: 80px;
-        }
-        .info-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            align-items: baseline;
-            margin: 10px 0;
-        }
-        .current-kehre-display {
-            background: linear-gradient(135deg, #eef3e4, #e2ecd6);
-            border-radius: 60px;
-            padding: 8px 24px;
-        }
-        .current-kehre-label {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #4a6e3e;
-        }
-        .current-kehre-number {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #1b4d1b;
-            background: white;
-            padding: 2px 24px;
-            border-radius: 50px;
-            display: inline-block;
-            margin-left: 12px;
-            min-width: 80px;
-        }
-        .global-winner {
-            background: #ffecb3;
-            border-radius: 60px;
-            padding: 14px;
-            margin-top: 12px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-        .lock-info {
-            font-size: 0.8rem;
-            background: #f1e6cc;
-            border-radius: 30px;
-            padding: 6px 18px;
-        }
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .action-footer {
-            background: white;
-            border-top: 2px solid #dae8d0;
-            padding: 14px 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .action-btn {
-            background: #f0f5eb;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 60px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.9rem;
-            min-width: 110px;
-        }
-        .action-btn:active { transform: scale(0.96); }
-        .action-win { background: #ffdf8c; color: #1e4a1a; }
-        .action-reset { background: #e6ede0; }
-        .action-new { background: #1e5a2e; color: white; }
-        .action-clear { background: #fadbd2; color: #a33929; }
-        .action-pdf { background: #a43424; color: white; }
+    .header-controls select,
+    .header-controls button {
+      background: white;
+      color: #1f5e3a;
+      border: none;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: 0.1s;
+    }
 
-        .toast-msg {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a472a;
-            color: white;
-            padding: 14px 28px;
-            border-radius: 60px;
-            z-index: 5000;
-            font-weight: 600;
-            font-size: 1rem;
-            pointer-events: none;
-            box-shadow: 0 4px 12px black;
-        }
+    .header-controls button {
+      background: var(--gold);
+      color: #1f3a22;
+    }
+    .header-controls button:hover {
+      filter: brightness(0.92);
+      transform: scale(0.96);
+    }
 
-        body.game-finished .side-punkt,
-        body.game-finished .side-del,
-        body.game-finished .action-win,
-        body.game-finished .action-reset {
-            opacity: 0.5;
-            pointer-events: none;
-        }
+    .arena {
+      background: white;
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 12px 14px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
 
-        @media (max-width: 900px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            .team-panel {
-                max-height: 60vh;
-            }
-            .side-punkt {
-                min-width: 50px;
-                min-height: 50px;
-                font-size: 1.1rem;
-            }
-            .result-team-big {
-                font-size: 1.2rem;
-            }
-        }
+    .arena-top {
+      flex-shrink: 0;
+      margin-bottom: 10px;
+    }
 
-        @media print {
-            .action-footer, .top-bar .settings-group, .speech-toggle, .action-btn, .side-punkt, .side-del { display: none; }
-            .main-grid { display: block; }
-        }
-    </style>
+    .arena-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .arena-header input[type="text"] {
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: 2px solid var(--border);
+      border-radius: 40px;
+      padding: 6px 14px;
+      max-width: 200px;
+      background: var(--light);
+      color: #0d2b18;
+    }
+
+    .bahn-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .bahn-selector strong {
+      color: #1f5e3a;
+      font-size: 0.9rem;
+    }
+    .bahn-btn {
+      background: #eef3ea;
+      border: 2px solid transparent;
+      border-radius: 40px;
+      padding: 4px 14px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      min-width: 38px;
+    }
+    .bahn-btn.active {
+      background: var(--gold);
+      border-color: #1f5e3a;
+    }
+
+    .team-inputs {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .team-inputs input {
+      border: 2px solid var(--border);
+      border-radius: 40px;
+      padding: 6px 12px;
+      font-weight: 600;
+      background: #fafff9;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    .team-inputs div {
+      display: flex;
+      align-items: center;
+      font-weight: 900;
+      color: var(--green);
+      font-size: 1rem;
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .score-card {
+      background: #f7faf5;
+      border-radius: 20px;
+      padding: 10px 8px 8px;
+      text-align: center;
+      border-bottom: 6px solid var(--green);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: all 0.3s;
+      position: relative;
+    }
+    .score-card.red {
+      border-bottom-color: var(--red);
+    }
+    .score-card.winner {
+      border-bottom-color: var(--gold);
+      background: #fff9e6;
+      box-shadow: 0 0 0 3px var(--gold);
+    }
+    .score-card.winner .team-score {
+      color: var(--dark);
+    }
+    .winner-badge {
+      position: absolute;
+      top: -12px;
+      right: -8px;
+      background: var(--gold);
+      color: var(--dark);
+      font-weight: 900;
+      font-size: 0.7rem;
+      padding: 2px 14px;
+      border-radius: 40px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      letter-spacing: 0.5px;
+      border: 2px solid white;
+    }
+    .team-name {
+      font-size: clamp(0.95rem, 1.6vw, 1.3rem);
+      font-weight: 800;
+    }
+    .team-score {
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1.1;
+    }
+    .team-points {
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .team-points span {
+      display: inline-block;
+      background: var(--dark);
+      color: white;
+      padding: 2px 14px;
+      border-radius: 40px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .kehren-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 6px;
+      min-height: 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--green) #e8efe4;
+    }
+    .kehren-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .kehren-scroll::-webkit-scrollbar-track {
+      background: #e8efe4;
+      border-radius: 10px;
+    }
+    .kehren-scroll::-webkit-scrollbar-thumb {
+      background: var(--green);
+      border-radius: 10px;
+    }
+
+    .kehren {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 20px;
+    }
+
+    .kehren-title {
+      text-align: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      color: #1f3a22;
+      border-bottom: 2px dashed var(--border);
+      padding-bottom: 4px;
+    }
+
+    .kehre-row {
+      display: grid;
+      grid-template-columns: 55px 1fr 36px;
+      align-items: center;
+      gap: 4px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 40px;
+      padding: 2px 4px 2px 12px;
+      margin-bottom: 6px;
+      min-height: 40px;
+      transition: 0.1s;
+    }
+    .kehre-row.active {
+      border: 3px solid #2e7d4e;
+      background: #f3fff2;
+      box-shadow: 0 0 0 2px rgba(31, 94, 58, 0.15);
+    }
+    .kehre-row.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(0.4);
+    }
+
+    .kehre-number {
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: #1f5e3a;
+    }
+
+    .points {
+      display: flex;
+      gap: 3px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .point-btn {
+      min-width: 28px;
+      height: 28px;
+      border-radius: 40px;
+      border: 2px solid var(--border);
+      background: white;
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .point-btn:hover:not(:disabled) {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+    .point-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .kehre-value {
+      text-align: center;
+      font-weight: 900;
+      font-size: 1rem;
+      background: #eef5e9;
+      border-radius: 40px;
+      padding: 2px 0;
+      min-width: 28px;
+    }
+
+    .footer {
+      flex-shrink: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding-top: 8px;
+      border-top: 2px solid var(--border);
+      margin-top: 2px;
+    }
+    .footer button {
+      border: none;
+      border-radius: 60px;
+      padding: 8px 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: #e4eee0;
+      color: #1f3a22;
+      transition: 0.1s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .footer button.gold {
+      background: var(--gold);
+      color: #1f3a22;
+    }
+    .footer button:hover:not(:disabled) {
+      transform: scale(0.96);
+      filter: brightness(0.94);
+    }
+    .footer button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1d2f1d;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      z-index: 999;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+    }
+
+    @media (max-height: 700px) {
+      .header { padding: 6px 12px; }
+      .header h1 { font-size: 1rem; }
+      .header-controls select,
+      .header-controls button { padding: 4px 10px; font-size: 0.7rem; }
+      .arena { padding: 8px 10px; }
+      .team-inputs { gap: 6px; margin-bottom: 6px; }
+      .team-inputs input { padding: 4px 8px; font-size: 0.8rem; }
+      .score-card { padding: 6px 4px; }
+      .team-score { font-size: 2rem; }
+      .team-points span { font-size: 1rem; padding: 0 10px; }
+      .kehre-row { min-height: 32px; padding: 0 4px 0 8px; }
+      .point-btn { min-width: 24px; height: 24px; font-size: 0.7rem; }
+      .footer button { padding: 4px 12px; font-size: 0.75rem; }
+    }
+
+    @media (max-width: 700px) {
+      .team-inputs { grid-template-columns: 1fr; gap: 4px; }
+      .team-inputs div { justify-content: center; }
+    }
+
+    @media (min-width: 1200px) {
+      .kehre-row { grid-template-columns: 70px 1fr 44px; }
+    }
+  </style>
 </head>
 <body>
-<div class="dashboard">
-    <div class="top-bar">
-        <h1>🥌 ESV Grein · Sync-Scroll · Pro Kehre ein Wert 🥌</h1>
-        <div class="settings-group">
-            <input type="text" id="teamANameSide" class="team-name-input" value="Mannschaft W">
-            <span>🆚</span>
-            <input type="text" id="teamBNameSide" class="team-name-input" value="Mannschaft E">
-            <select id="kehrenSelect" class="setting-select">
-                <option value="4">4 Kehren</option>
-                <option value="5">5 Kehren</option>
-                <option value="6" selected>6 Kehren</option>
-                <option value="7">7 Kehren</option>
-                <option value="8">8 Kehren</option>
-                <option value="9">9 Kehren</option>
-                <option value="10">10 Kehren</option>
-                <option value="11">11 Kehren</option>
-                <option value="12">12 Kehren</option>
-            </select>
-            <select id="stockPunkteSelect" class="setting-select">
-                <option value="4">4 Punkte max</option>
-                <option value="5">5 Punkte max</option>
-                <option value="6" selected>6 Punkte max</option>
-            </select>
-            <button id="applyConfigBtn" class="apply-btn">Übernehmen</button>
-            <div class="speech-toggle"><input type="checkbox" id="speechToggleSide" checked><label>🔊 Ansage</label></div>
-        </div>
+
+<div class="app-wrapper">
+  <div class="header">
+    <h1>🥌 ESV Grein</h1>
+    <div class="header-controls">
+      <select id="gamesSelect">
+        <option value="2" selected>2 Siege</option>
+        <option value="3">3 Siege</option>
+        <option value="4">4 Siege</option>
+        <option value="5">5 Siege</option>
+        <option value="6">6 Siege</option>
+      </select>
+      <select id="kehrenSelect">
+        <option value="4">4 Kehren</option>
+        <option value="6" selected>6 Kehren</option>
+        <option value="8">8 Kehren</option>
+        <option value="10">10 Kehren</option>
+        <option value="12">12 Kehren</option>
+      </select>
+      <button type="button" onclick="openSpectatorWindow()">📺 Monitor</button>
+      <button type="button" onclick="fullReset()">🔄 Reset</button>
     </div>
+  </div>
 
-    <div class="main-grid">
-        <div class="team-panel left" id="leftPanel">
-            <div class="team-header"><span>🥌</span> <span id="leftTeamName">Mannschaft W</span></div>
-            <div id="leftStocksPanel" class="kehren-list"></div>
-            <div style="text-align:center; font-size:11px; margin-top:12px; color:#698a69;">👆 Punkte (1..max) pro Kehre antippen</div>
-        </div>
-
-        <div class="center-hero">
-            <div class="result-mega">
-                <div class="result-card-big" style="border-bottom: 6px solid #2c7a4d;">
-                    <div class="result-team-big"><span>🥌</span> <span id="centerTeamA">Mannschaft W</span></div>
-                    <div class="current-round-big" id="centerTotalA">0</div>
-                    <div class="games-won-big">🏆 GEWONNENE SPIELE 🏆<br><span class="games-number-big" id="centerGamesA">0</span></div>
-                </div>
-                <div class="result-card-big" style="border-bottom: 6px solid #c0392b;">
-                    <div class="result-team-big"><span id="centerTeamB">Mannschaft E</span> <span>🥌</span></div>
-                    <div class="current-round-big" id="centerTotalB">0</div>
-                    <div class="games-won-big">🏆 GEWONNENE SPIELE 🏆<br><span class="games-number-big" id="centerGamesB">0</span></div>
-                </div>
-            </div>
-            <div class="info-row">
-                <div class="current-kehre-display">
-                    <span class="current-kehre-label">📋 AKTUELLE KEHRE</span>
-                    <span class="current-kehre-number" id="currentKehreDisplay">1</span>
-                </div>
-                <div class="lock-info" id="lockInfoMitte" style="display: none;">🔒 Sieger steht fest</div>
-            </div>
-            <div id="globalWinnerMsg" style="margin-top: 8px; text-align: center;"></div>
-        </div>
-
-        <div class="team-panel right" id="rightPanel">
-            <div class="team-header"><span id="rightTeamName">Mannschaft E</span> <span>🥌</span></div>
-            <div id="rightStocksPanel" class="kehren-list"></div>
-            <div style="text-align:center; font-size:11px; margin-top:12px; color:#698a69;">👆 Punkte (1..max) pro Kehre antippen</div>
-        </div>
-    </div>
-
-    <div class="action-footer">
-        <button class="action-btn action-win" id="winGameBtn">🏆 Manuell werten</button>
-        <button class="action-btn action-reset" id="resetRoundBtn">🔄 Runde löschen</button>
-        <button class="action-btn action-new" id="newGameBtn">✨ Neues Spiel</button>
-        <button class="action-btn action-clear" id="resetTotalBtn">🗑️ Siege reset</button>
-        <button class="action-btn action-pdf" id="printPDFBtn">🖨️ Drucken (PDF)</button>
-    </div>
+  <div class="arena" id="arenaContainer"></div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-    // -------------------- KONFIGURATION: JEDE KEHRE = EIN PUNKTWERT --------------------
-    let anzahlKehren = 6;
-    let maxPunkteProKehre = 6;
-    
-    let teamAKehren = [];
-    let teamBKehren = [];
-    
-    let gamesWonA = 0, gamesWonB = 0;
-    let overallWinner = false;
-    let teamAName = "Mannschaft W";
-    let teamBName = "Mannschaft E";
-    let speechEnabled = true;
-    let autoEvaluationLock = false;
-    
-    // Sync-Scroll: Verhindere Endlosschleife
-    let isScrollingLeft = false;
-    let isScrollingRight = false;
-    
-    // DOM
-    const centerTeamA = document.getElementById('centerTeamA');
-    const centerTeamB = document.getElementById('centerTeamB');
-    const centerTotalA = document.getElementById('centerTotalA');
-    const centerTotalB = document.getElementById('centerTotalB');
-    const centerGamesA = document.getElementById('centerGamesA');
-    const centerGamesB = document.getElementById('centerGamesB');
-    const currentKehreSpan = document.getElementById('currentKehreDisplay');
-    const globalWinnerMsgDiv = document.getElementById('globalWinnerMsg');
-    const lockInfoMitte = document.getElementById('lockInfoMitte');
-    
-    const leftPanelEl = document.getElementById('leftPanel');
-    const rightPanelEl = document.getElementById('rightPanel');
-    
-    function initDataStructures() {
-        teamAKehren = new Array(anzahlKehren).fill(0);
-        teamBKehren = new Array(anzahlKehren).fill(0);
+  (function() {
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
     }
-    
-    function getCurrentKehreIndex() {
-        if (overallWinner) return anzahlKehren;
-        for (let k = 0; k < anzahlKehren; k++) {
-            if (teamAKehren[k] === 0 && teamBKehren[k] === 0) return k;
+    function sum(arr) {
+      return arr.reduce((a, b) => a + (b || 0), 0);
+    }
+
+    const state = {
+      kehren: 6,
+      winsToChampion: 2,
+      arena: null,
+      autoEvaluateEnabled: true // Automatik aktiv
+    };
+
+    function createArena(id) {
+      return {
+        id,
+        arenaName: 'Training',
+        bahn: 1,
+        teamA: 'Mannschaft W',
+        teamB: 'Mannschaft E',
+        pointsA: Array(state.kehren).fill(null),
+        pointsB: Array(state.kehren).fill(null),
+        winsA: 0,
+        winsB: 0,
+        finished: false
+      };
+    }
+    state.arena = createArena(1);
+
+    const arenaContainer = document.getElementById('arenaContainer');
+    const toastEl = document.getElementById('toast');
+    let evaluateTimeout = null;
+
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastEl._timer);
+      toastEl._timer = setTimeout(() => toastEl.classList.remove('show'), 2500);
+    }
+
+    function hasWinner(arena) {
+      return arena.winsA >= state.winsToChampion || arena.winsB >= state.winsToChampion;
+    }
+
+    function getWinner(arena) {
+      if (arena.winsA >= state.winsToChampion) return 'A';
+      if (arena.winsB >= state.winsToChampion) return 'B';
+      return null;
+    }
+
+    function getWinnerName(arena) {
+      const w = getWinner(arena);
+      if (w === 'A') return arena.teamA;
+      if (w === 'B') return arena.teamB;
+      return '';
+    }
+
+    // Prüft ob alle Kehren ausgefüllt sind und führt automatische Wertung durch
+    function checkAndAutoEvaluate() {
+      const arena = state.arena;
+      if (!state.autoEvaluateEnabled) return false;
+      if (arena.finished || hasWinner(arena)) return false;
+
+      // Prüfen ob alle Kehren ausgefüllt sind
+      let allFilled = true;
+      for (let i = 0; i < state.kehren; i++) {
+        if (arena.pointsA[i] === null || arena.pointsB[i] === null) {
+          allFilled = false;
+          break;
         }
-        return anzahlKehren;
-    }
-    
-    function getCurrentKehreNumber() {
-        return getCurrentKehreIndex() + 1;
-    }
-    
-    function isKehreComplete(kehreIdx) {
-        return (teamAKehren[kehreIdx] !== 0 || teamBKehren[kehreIdx] !== 0);
-    }
-    
-    function isEveryKehrePlayed() {
-        for (let k = 0; k < anzahlKehren; k++) {
-            if (teamAKehren[k] === 0 && teamBKehren[k] === 0) return false;
-        }
+      }
+
+      if (allFilled) {
+        // Verzögerte Ausführung damit die UI sich aktualisieren kann
+        clearTimeout(evaluateTimeout);
+        evaluateTimeout = setTimeout(() => {
+          performEvaluate();
+        }, 150);
         return true;
+      }
+      return false;
     }
-    
-    function totalGamePoints(teamKehren) {
-        return teamKehren.reduce((sum, val) => sum + val, 0);
-    }
-    
-    function playKehreSoundAndVisual(kehreIdx) {
-        if (kehreIdx < 0 || kehreIdx >= anzahlKehren) return;
-        speakText(`Kehre ${kehreIdx+1} ist komplett gespielt!`);
-        showToast(`🎯 Kehre ${kehreIdx+1} wurde gespielt! 🎯`, 2000);
-    }
-    
-    function tryAdvanceToNextKehre() {
-        if (overallWinner) return false;
-        const currentIdx = getCurrentKehreIndex();
-        if (currentIdx >= anzahlKehren) return false;
-        
-        const teamASet = teamAKehren[currentIdx] !== 0;
-        const teamBSet = teamBKehren[currentIdx] !== 0;
-        
-        if ((teamASet && teamBSet) && !isEveryKehrePlayed()) {
-            playKehreSoundAndVisual(currentIdx);
-            renderFullPanels();
-            updateCenterUI();
-            speakText(`Nächste Kehre ${currentIdx+2}.`);
-            showToast(`✅ Kehre ${currentIdx+1} fertig! Weiter zu Kehre ${currentIdx+2}.`, 2000);
-            return true;
+
+    function performEvaluate() {
+      const arena = state.arena;
+      if (arena.finished || hasWinner(arena)) return;
+      
+      // Nochmal prüfen ob alle Kehren ausgefüllt sind
+      for (let i = 0; i < state.kehren; i++) {
+        if (arena.pointsA[i] === null || arena.pointsB[i] === null) {
+          return;
         }
-        return false;
+      }
+
+      const a = sum(arena.pointsA);
+      const b = sum(arena.pointsB);
+      
+      let msg = '';
+      if (a > b) {
+        arena.winsA++;
+        msg = `${arena.teamA} gewinnt das Spiel (${a}:${b})`;
+      } else if (b > a) {
+        arena.winsB++;
+        msg = `${arena.teamB} gewinnt das Spiel (${a}:${b})`;
+      } else {
+        msg = `Unentschieden (${a}:${b}) – kein Punkt`;
+      }
+      
+      toast(msg);
+      
+      // Kehren zurücksetzen für nächste Runde
+      arena.pointsA = Array(state.kehren).fill(null);
+      arena.pointsB = Array(state.kehren).fill(null);
+
+      // Prüfen ob ein Sieger feststeht
+      if (hasWinner(arena)) {
+        arena.finished = true;
+        const winner = getWinnerName(arena);
+        toast(`🏆 ${winner} gewinnt das Training mit ${state.winsToChampion} Siegen!`);
+      } else {
+        // Nächste Runde
+        toast(`Nächste Runde – ${msg}`);
+      }
+      
+      render();
     }
-    
-    function autoEvaluateGameIfComplete() {
-        if (overallWinner) return false;
-        if (!isEveryKehrePlayed()) return false;
-        if (autoEvaluationLock) return false;
-        
-        const totalA = totalGamePoints(teamAKehren);
-        const totalB = totalGamePoints(teamBKehren);
-        if (totalA === 0 && totalB === 0) return false;
-        
-        autoEvaluationLock = true;
-        let winnerTeam = null;
-        let isTie = false;
-        if (totalA > totalB) winnerTeam = 'A';
-        else if (totalB > totalA) winnerTeam = 'B';
-        else isTie = true;
-        
-        if (!isTie && winnerTeam) {
-            const winnerName = winnerTeam === 'A' ? teamAName : teamBName;
-            speakText(`Alle ${anzahlKehren} Kehren gespielt. ${winnerName} gewinnt das Spiel mit ${totalA}:${totalB}.`);
-            showToast(`🏆 Automatische Wertung: ${winnerName} gewinnt! (${totalA}:${totalB})`, 4000);
-            if (winnerTeam === 'A') gamesWonA++;
-            else gamesWonB++;
-            updateCenterUI();
-            if (!checkAndSetOverallWinner()) {
-                initDataStructures();
-                renderFullPanels();
-                updateCenterUI();
-                showToast("🔄 Neue Runde gestartet – alle Kehren zurückgesetzt", 2000);
-                speakText("Neue Runde, alle Kehren zurückgesetzt.");
-            } else {
-                renderFullPanels();
-                updateCenterUI();
-            }
-            autoEvaluationLock = false;
-            return true;
-        } else if (isTie) {
-            speakText(`Alle Kehren gespielt. Unentschieden ${totalA}:${totalB}. Bitte manuell entscheiden.`);
-            showToast(`⚠️ UNENTSCHIEDEN (${totalA}:${totalB}) – Nutze "Spiel gewinnen"`, 5000);
-            globalWinnerMsgDiv.innerHTML = `<div class="global-winner" style="background:#ffe0a3;">🤝 UNENTSCHIEDEN nach ${anzahlKehren} Kehren (${totalA}:${totalB}) → bitte Sieger wählen</div>`;
-            autoEvaluationLock = false;
-            return false;
+
+    function render() {
+      if (!arenaContainer) return;
+      arenaContainer.innerHTML = renderArena(state.arena);
+      updateSpectatorWindow();
+    }
+
+    function renderArena(arena) {
+      const scoreA = sum(arena.pointsA);
+      const scoreB = sum(arena.pointsB);
+      const winner = getWinner(arena);
+      const isFinished = arena.finished || hasWinner(arena);
+
+      return `
+        <div class="arena-top">
+          <div class="arena-header">
+            <input type="text" value="${escapeHTML(arena.arenaName)}" 
+                   onchange="window.setArenaName(this.value)" placeholder="Trainingsname">
+            <div class="bahn-selector">
+              <strong>🎯 Bahn</strong>
+              ${[1,2,3,4].map(b => `
+                <button type="button" class="bahn-btn ${arena.bahn === b ? 'active' : ''}" 
+                        onclick="window.setBahn(${b})">${b}</button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="team-inputs">
+            <input type="text" value="${escapeHTML(arena.teamA)}" onchange="window.setTeam('A', this.value)" ${isFinished ? 'disabled style="opacity:0.6;"' : ''}>
+            <div>VS</div>
+            <input type="text" value="${escapeHTML(arena.teamB)}" onchange="window.setTeam('B', this.value)" ${isFinished ? 'disabled style="opacity:0.6;"' : ''}>
+          </div>
+
+          <div class="scoreboard">
+            <div class="score-card ${winner === 'A' ? 'winner' : ''}">
+              ${winner === 'A' ? '<div class="winner-badge">🏆 SIEGER</div>' : ''}
+              <div class="team-name">${escapeHTML(arena.teamA)}</div>
+              <div class="team-score">${scoreA}</div>
+              <div class="team-points">Gewonnene Spiele<br><span>${arena.winsA}</span></div>
+            </div>
+            <div class="score-card ${winner === 'B' ? 'winner' : ''} red">
+              ${winner === 'B' ? '<div class="winner-badge">🏆 SIEGER</div>' : ''}
+              <div class="team-name">${escapeHTML(arena.teamB)}</div>
+              <div class="team-score">${scoreB}</div>
+              <div class="team-points">Gewonnene Spiele<br><span>${arena.winsB}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kehren-scroll">
+          <div class="kehren">
+            <div>
+              <div class="kehren-title">${escapeHTML(arena.teamA)}</div>
+              ${renderKehren(arena, 'A', isFinished)}
+            </div>
+            <div>
+              <div class="kehren-title">${escapeHTML(arena.teamB)}</div>
+              ${renderKehren(arena, 'B', isFinished)}
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <button type="button" class="gold" onclick="window.manualEvaluate()" ${isFinished ? 'disabled' : ''}>
+            ${isFinished ? '🏁 Beendet' : '🏆 Manuell werten'}
+          </button>
+          <button type="button" onclick="window.resetCurrent()" ${isFinished ? 'disabled' : ''}>
+            ${isFinished ? '🔒 Gesperrt' : '🔄 Kehren löschen'}
+          </button>
+          ${isFinished ? `<button type="button" onclick="window.fullReset()" style="background:var(--gold);">🆕 Neues Spiel</button>` : ''}
+          <button type="button" onclick="window.toggleAutoEvaluate()" style="${state.autoEvaluateEnabled ? 'background:var(--green);color:white;' : 'background:#ddd;'}">
+            ${state.autoEvaluateEnabled ? '✅ Auto' : '⏸️ Manuell'}
+          </button>
+        </div>
+      `;
+    }
+
+    function renderKehren(arena, team, isFinished) {
+      const arr = team === 'A' ? arena.pointsA : arena.pointsB;
+      let html = '';
+      for (let i = 0; i < state.kehren; i++) {
+        const active = !isFinished && (activeKehre(arena) === i + 1);
+        const disabled = isFinished || hasWinner(arena);
+        html += `
+          <div class="kehre-row ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}">
+            <div class="kehre-number">Kehre ${i+1}</div>
+            <div class="points">
+              ${[0,1,2,3,4].map(v => `
+                <button type="button" class="point-btn" 
+                        onclick="window.setPoints('${team}', ${i}, ${v})"
+                        ${disabled ? 'disabled' : ''}>
+                  ${v}
+                </button>
+              `).join('')}
+            </div>
+            <div class="kehre-value">${arr[i] ?? '-'}</div>
+          </div>
+        `;
+      }
+      return html;
+    }
+
+    function activeKehre(arena) {
+      for (let i = 0; i < state.kehren; i++) {
+        if (arena.pointsA[i] === null || arena.pointsB[i] === null) return i + 1;
+      }
+      return state.kehren;
+    }
+
+    // ---- Globale Funktionen ----
+    window.setPoints = function(team, index, value) {
+      const arena = state.arena;
+      if (hasWinner(arena) || arena.finished) {
+        toast('Spiel bereits beendet!');
+        return;
+      }
+      if (team === 'A') {
+        arena.pointsA[index] = value;
+        if (arena.pointsB[index] === null) arena.pointsB[index] = 0;
+      } else {
+        arena.pointsB[index] = value;
+        if (arena.pointsA[index] === null) arena.pointsA[index] = 0;
+      }
+      render();
+      
+      // Automatische Wertung prüfen (nach Render damit UI aktuell ist)
+      setTimeout(() => {
+        checkAndAutoEvaluate();
+      }, 50);
+    };
+
+    window.manualEvaluate = function() {
+      const arena = state.arena;
+      if (hasWinner(arena) || arena.finished) {
+        toast('Spiel bereits beendet!');
+        return;
+      }
+      // Prüfen ob alle Kehren ausgefüllt sind
+      for (let i = 0; i < state.kehren; i++) {
+        if (arena.pointsA[i] === null || arena.pointsB[i] === null) {
+          toast('Bitte alle Kehren ausfüllen');
+          return;
         }
-        autoEvaluationLock = false;
-        return false;
+      }
+      performEvaluate();
+    };
+
+    window.toggleAutoEvaluate = function() {
+      state.autoEvaluateEnabled = !state.autoEvaluateEnabled;
+      toast(state.autoEvaluateEnabled ? 'Auto-Wertung aktiviert' : 'Auto-Wertung deaktiviert');
+      render();
+    };
+
+    window.setBahn = function(bahn) {
+      if (state.arena.finished) {
+        toast('Spiel beendet – Reset für neue Bahn');
+        return;
+      }
+      state.arena.bahn = bahn;
+      render();
+    };
+
+    window.setArenaName = function(name) {
+      state.arena.arenaName = name;
+      render();
+    };
+
+    window.setTeam = function(team, name) {
+      if (state.arena.finished) {
+        toast('Spiel beendet – Reset für neue Teams');
+        return;
+      }
+      if (team === 'A') state.arena.teamA = name;
+      else state.arena.teamB = name;
+      render();
+    };
+
+    window.resetCurrent = function() {
+      if (state.arena.finished) {
+        toast('Spiel beendet – verwende "Neues Spiel"');
+        return;
+      }
+      state.arena.pointsA = Array(state.kehren).fill(null);
+      state.arena.pointsB = Array(state.kehren).fill(null);
+      render();
+    };
+
+    window.fullReset = function() {
+      state.arena = createArena(1);
+      state.arena.finished = false;
+      render();
+      toast('Neues Spiel gestartet');
+    };
+
+    // ---- Spectator ----
+    let spectatorWindow = null;
+    window.openSpectatorWindow = function() {
+      spectatorWindow = window.open('', 'spectator', 'width=1280,height=800');
+      if (!spectatorWindow) {
+        alert('Bitte Popups erlauben für den Zuschauer-Monitor.');
+        return;
+      }
+      spectatorWindow.document.write(`
+        <html><head><title>Zuschauer Monitor</title>
+        <style>
+          * { margin:0; padding:0; box-sizing:border-box; }
+          body { background:#102417; color:white; font-family:Segoe UI,sans-serif; padding:20px; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+          .card { background:white; color:#1f3a22; border-radius:40px; padding:30px 40px; max-width:1000px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,0.6); }
+          .title { font-size:2.6rem; font-weight:900; margin-bottom:8px; }
+          .bahn { display:inline-block; background:#ffdf8c; padding:6px 18px; border-radius:40px; font-weight:700; margin-bottom:20px; }
+          .teams { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:10px; }
+          .team { background:#f5f8f3; border-radius:30px; padding:20px; text-align:center; position:relative; }
+          .team.winner { background:#fff9e6; border:3px solid #ffdf8c; }
+          .name { font-size:2.2rem; font-weight:800; }
+          .score { font-size:6rem; font-weight:900; color:#1f5e3a; line-height:1; }
+          .wins { font-size:2rem; font-weight:700; margin-top:8px; }
+          .badge { position:absolute; top:-10px; right:-10px; background:#ffdf8c; color:#1f3a22; padding:2px 16px; border-radius:40px; font-weight:900; font-size:0.8rem; border:2px solid white; }
+          @media (max-width:700px){ .title{font-size:2rem;} .score{font-size:4rem;} .name{font-size:1.6rem;} }
+        </style>
+        </head><body>
+        <div class="card" id="specGrid"></div>
+        </body></html>
+      `);
+      spectatorWindow.document.close();
+      updateSpectatorWindow();
+    };
+
+    function updateSpectatorWindow() {
+      if (!spectatorWindow || spectatorWindow.closed) return;
+      const grid = spectatorWindow.document.getElementById('specGrid');
+      if (!grid) return;
+      const arena = state.arena;
+      const winner = getWinner(arena);
+      grid.innerHTML = `
+        <div class="title">${escapeHTML(arena.arenaName)}</div>
+        <div class="bahn">🎯 Bahn ${arena.bahn} ${arena.finished ? '🏁' : ''}</div>
+        <div class="teams">
+          <div class="team ${winner === 'A' ? 'winner' : ''}">
+            ${winner === 'A' ? '<div class="badge">🏆 SIEGER</div>' : ''}
+            <div class="name">${escapeHTML(arena.teamA)}</div>
+            <div class="score">${sum(arena.pointsA)}</div>
+            <div class="wins">🏆 ${arena.winsA}</div>
+          </div>
+          <div class="team ${winner === 'B' ? 'winner' : ''}">
+            ${winner === 'B' ? '<div class="badge">🏆 SIEGER</div>' : ''}
+            <div class="name">${escapeHTML(arena.teamB)}</div>
+            <div class="score">${sum(arena.pointsB)}</div>
+            <div class="wins">🏆 ${arena.winsB}</div>
+          </div>
+        </div>
+        ${arena.finished ? `<div style="text-align:center;margin-top:20px;font-size:1.8rem;font-weight:900;color:#1f5e3a;">🏆 ${getWinnerName(arena)} gewinnt!</div>` : ''}
+      `;
     }
-    
-    function checkAndSetOverallWinner() {
-        if (gamesWonA >= 2) {
-            overallWinner = true;
-            speakText(`🏆 Gesamtsieger: ${teamAName} hat zwei Spiele gewonnen!`);
-            showToast(`🏆🏆🏆 ${teamAName} ist GESAMTSIEGER! 🏆🏆🏆`, 5000);
-            updateCenterUI();
-            return true;
-        } else if (gamesWonB >= 2) {
-            overallWinner = true;
-            speakText(`🏆 Gesamtsieger: ${teamBName} hat zwei Spiele gewonnen!`);
-            showToast(`🏆🏆🏆 ${teamBName} ist GESAMTSIEGER! 🏆🏆🏆`, 5000);
-            updateCenterUI();
-            return true;
-        }
-        return false;
-    }
-    
-    function setPoints(team, kehreIdx, punkte) {
-        if (overallWinner) { showToast("Spiel beendet – neues Spiel starten"); return; }
-        const currentIdx = getCurrentKehreIndex();
-        if (kehreIdx !== currentIdx) {
-            showToast(`Nur die aktuelle Kehre (${currentIdx+1}) kann bearbeitet werden.`, 1500);
-            return;
-        }
-        if (punkte >= 1 && punkte <= maxPunkteProKehre) {
-            let oldVal = (team === 'A') ? teamAKehren[kehreIdx] : teamBKehren[kehreIdx];
-            if (oldVal !== punkte) {
-                if (team === 'A') teamAKehren[kehreIdx] = punkte;
-                else teamBKehren[kehreIdx] = punkte;
-                const tname = (team === 'A') ? teamAName : teamBName;
-                speakText(`${tname} erzielt in Kehre ${kehreIdx+1} ${punkte === 1 ? 'einen Punkt' : punkte+' Punkte'}.`);
-                renderFullPanels();
-                updateCenterUI();
-                
-                const teamASet = teamAKehren[currentIdx] !== 0;
-                const teamBSet = teamBKehren[currentIdx] !== 0;
-                if (teamASet && teamBSet) {
-                    if (isEveryKehrePlayed()) {
-                        autoEvaluateGameIfComplete();
-                    } else {
-                        tryAdvanceToNextKehre();
-                    }
-                }
-            }
-        } else {
-            showToast(`Punkte nur 1-${maxPunkteProKehre} möglich`, 1000);
-        }
-    }
-    
-    function deletePoints(team, kehreIdx) {
-        if (overallWinner) { showToast("Spiel beendet"); return; }
-        const currentIdx = getCurrentKehreIndex();
-        if (kehreIdx !== currentIdx) {
-            showToast(`Nur aktuelle Kehre (${currentIdx+1}) editierbar`, 1200);
-            return;
-        }
-        if (team === 'A') teamAKehren[kehreIdx] = 0;
-        else teamBKehren[kehreIdx] = 0;
-        renderFullPanels();
-        updateCenterUI();
-        showToast(`Punkt in Kehre ${kehreIdx+1} gelöscht`, 1000);
-        if (globalWinnerMsgDiv.innerHTML.includes("UNENTSCHIEDEN")) globalWinnerMsgDiv.innerHTML = '';
-    }
-    
-    function resetRound() {
-        if (overallWinner) { showToast("Spiel vorbei, neues Spiel starten"); return; }
-        initDataStructures();
-        renderFullPanels();
-        updateCenterUI();
-        showToast("Alle Kehren zurückgesetzt – starte bei Kehre 1", 1800);
-        speakText("Runde komplett gelöscht.");
-        autoEvaluationLock = false;
-        if (globalWinnerMsgDiv.innerHTML.includes("UNENTSCHIEDEN")) globalWinnerMsgDiv.innerHTML = '';
-    }
-    
-    function addWin(winner) {
-        if (overallWinner) return;
-        if (winner === 'A') gamesWonA++;
-        else gamesWonB++;
-        updateCenterUI();
-        if (!checkAndSetOverallWinner()) {
-            initDataStructures();
-            renderFullPanels();
-            updateCenterUI();
-            showToast("Neue Runde gestartet – alle Kehren zurück", 1500);
-        } else {
-            renderFullPanels();
-            updateCenterUI();
-        }
-        autoEvaluationLock = false;
-    }
-    
-    function winGameHandler() {
-        if (overallWinner) { showToast("Spiel bereits entschieden"); return; }
-        const totalA = totalGamePoints(teamAKehren);
-        const totalB = totalGamePoints(teamBKehren);
-        if (totalA === 0 && totalB === 0) { showToast("Keine Punkte eingetragen!"); return; }
-        if (totalA === totalB) {
-            const modalDiv = document.createElement('div');
-            modalDiv.style.position='fixed'; modalDiv.style.top=0; modalDiv.style.left=0; modalDiv.style.right=0; modalDiv.style.bottom=0;
-            modalDiv.style.background='rgba(0,0,0,0.7)'; modalDiv.style.display='flex'; modalDiv.style.alignItems='center'; modalDiv.style.justifyContent='center'; modalDiv.style.zIndex=9999;
-            modalDiv.innerHTML = `<div style="background:white; border-radius: 48px; padding:24px; text-align:center;"><h3>🤝 Unentschieden</h3><p>${totalA}:${totalB} – Wer gewinnt das Spiel?</p><div style="display:flex; gap:15px; margin-top:20px;"><button id="chooseA" style="background:#2c7a4d; color:white; border:none; padding:12px 28px; border-radius:40px;">🥌 ${teamAName}</button><button id="chooseB" style="background:#c0392b; color:white; border:none; padding:12px 28px; border-radius:40px;">🥌 ${teamBName}</button><button id="cancelModal" style="background:#ccc; padding:12px 24px;">Abbrechen</button></div></div>`;
-            document.body.appendChild(modalDiv);
-            modalDiv.querySelector('#chooseA').onclick = () => { addWin('A'); modalDiv.remove(); };
-            modalDiv.querySelector('#chooseB').onclick = () => { addWin('B'); modalDiv.remove(); };
-            modalDiv.querySelector('#cancelModal').onclick = () => modalDiv.remove();
-        } else {
-            const winner = totalA > totalB ? 'A' : 'B';
-            const winnerName = winner === 'A' ? teamAName : teamBName;
-            if (confirm(`${winnerName} gewinnt das Spiel (${totalA}:${totalB}). Bestätigen?`)) addWin(winner);
-        }
-    }
-    
-    function fullGameReset() {
-        if (confirm("KOMPLETTRESET: Alle Punkte, Siege werden zurückgesetzt")) {
-            initDataStructures();
-            gamesWonA = 0; gamesWonB = 0; overallWinner = false; autoEvaluationLock = false;
-            updateCenterUI();
-            renderFullPanels();
-            globalWinnerMsgDiv.innerHTML = '';
-            showToast("Neues Spiel gestartet – Kehre 1", 1800);
-            speakText("Neues Spiel gestartet.");
-            document.body.classList.remove('game-finished');
-        }
-    }
-    
-    function resetScoreOnly() {
-        if (confirm("Nur gewonnene Spiele zurücksetzen? (Punkte bleiben erhalten)")) {
-            gamesWonA = 0; gamesWonB = 0; overallWinner = false; autoEvaluationLock = false;
-            updateCenterUI();
-            renderFullPanels();
-            globalWinnerMsgDiv.innerHTML = '';
-            showToast("Siege zurückgesetzt", 1300);
-            speakText("Gewonnene Spiele zurückgesetzt.");
-            document.body.classList.remove('game-finished');
-        }
-    }
-    
-    function applyConfiguration() {
-        let neueKehren = parseInt(document.getElementById('kehrenSelect').value);
-        let neueMaxPunkte = parseInt(document.getElementById('stockPunkteSelect').value);
-        if (neueKehren !== anzahlKehren || neueMaxPunkte !== maxPunkteProKehre) {
-            if (confirm(`Konfiguration ändern: ${neueKehren} Kehren, max ${neueMaxPunkte} Punkte? Runde wird zurückgesetzt.`)) {
-                anzahlKehren = neueKehren;
-                maxPunkteProKehre = neueMaxPunkte;
-                initDataStructures();
-                gamesWonA = 0; gamesWonB = 0; overallWinner = false; autoEvaluationLock = false;
-                updateCenterUI();
-                renderFullPanels();
-                globalWinnerMsgDiv.innerHTML = '';
-                showToast(`Konfiguration übernommen: ${anzahlKehren} Kehren, max ${maxPunkteProKehre} Punkte`, 2000);
-                speakText("Einstellungen aktualisiert.");
-            }
-        } else { showToast("Bereits aktiv", 1000); }
-    }
-    
-    function updateCenterUI() {
-        const totalA = totalGamePoints(teamAKehren);
-        const totalB = totalGamePoints(teamBKehren);
-        centerTotalA.innerText = totalA;
-        centerTotalB.innerText = totalB;
-        centerGamesA.innerText = gamesWonA;
-        centerGamesB.innerText = gamesWonB;
-        const currKehre = getCurrentKehreNumber();
-        currentKehreSpan.innerText = overallWinner ? "🏁" : (currKehre > anzahlKehren ? anzahlKehren : currKehre);
-        
-        if (overallWinner) {
-            const winnerName = gamesWonA >= 2 ? teamAName : teamBName;
-            globalWinnerMsgDiv.innerHTML = `<div class="global-winner">🏆🏆🏆 ${winnerName} hat 2 Spiele gewonnen & ist GESAMTSIEGER! 🏆🏆🏆</div>`;
-            lockInfoMitte.style.display = 'inline-block';
-            document.body.classList.add('game-finished');
-        } else {
-            lockInfoMitte.style.display = 'none';
-            document.body.classList.remove('game-finished');
-            if (isEveryKehrePlayed() && !autoEvaluationLock) autoEvaluateGameIfComplete();
-            else if (!isEveryKehrePlayed() && globalWinnerMsgDiv.innerHTML.includes("UNENTSCHIEDEN")) globalWinnerMsgDiv.innerHTML = '';
-        }
-        updateRowColorsAndKehrenBackground();
-    }
-    
-    function updateRowColorsAndKehrenBackground() {
-        const currentIdx = getCurrentKehreIndex();
-        const leftCards = document.querySelectorAll('#leftStocksPanel .kehre-card');
-        const rightCards = document.querySelectorAll('#rightStocksPanel .kehre-card');
-        for (let i = 0; i < leftCards.length; i++) {
-            leftCards[i].classList.remove('current-kehre-bg', 'played-kehre-bg');
-            rightCards[i].classList.remove('current-kehre-bg', 'played-kehre-bg');
-            const isPlayed = (teamAKehren[i] !== 0 || teamBKehren[i] !== 0);
-            if (i === currentIdx && isPlayed && !isEveryKehrePlayed()) {
-                leftCards[i].classList.add('played-kehre-bg');
-                rightCards[i].classList.add('played-kehre-bg');
-            } else if (i === currentIdx && !isPlayed) {
-                leftCards[i].classList.add('current-kehre-bg');
-                rightCards[i].classList.add('current-kehre-bg');
-            } else if (i < currentIdx && isPlayed) {
-                leftCards[i].classList.add('played-kehre-bg');
-                rightCards[i].classList.add('played-kehre-bg');
-            }
-        }
-    }
-    
-    function renderFullPanels() {
-        document.getElementById('leftTeamName').innerHTML = teamAName;
-        document.getElementById('rightTeamName').innerHTML = teamBName;
-        centerTeamA.innerText = teamAName;
-        centerTeamB.innerText = teamBName;
-        
-        const currentIdx = getCurrentKehreIndex();
-        const leftPanel = document.getElementById('leftStocksPanel');
-        const rightPanel = document.getElementById('rightStocksPanel');
-        leftPanel.innerHTML = '';
-        rightPanel.innerHTML = '';
-        
-        for (let k = 0; k < anzahlKehren; k++) {
-            let btnsHtml = '';
-            for (let p = 1; p <= maxPunkteProKehre; p++) btnsHtml += `<button class="side-punkt" data-val="${p}">${p}</button>`;
-            
-            const cardA = document.createElement('div'); cardA.className = 'kehre-card';
-            cardA.innerHTML = `
-                <div class="kehre-header"><span>🥌 Kehre ${k+1}</span></div>
-                <div class="punkte-container">
-                    <div class="button-group">${btnsHtml}</div>
-                    <span class="side-value">${teamAKehren[k] || 0}</span>
-                    <button class="side-del">🗑️</button>
-                </div>
-            `;
-            cardA.querySelectorAll('.side-punkt').forEach(btn => {
-                const val = parseInt(btn.getAttribute('data-val'));
-                btn.addEventListener('click', () => setPoints('A', k, val));
-            });
-            cardA.querySelector('.side-del').addEventListener('click', () => deletePoints('A', k));
-            leftPanel.appendChild(cardA);
-            
-            const cardB = document.createElement('div'); cardB.className = 'kehre-card';
-            cardB.innerHTML = `
-                <div class="kehre-header"><span>🥌 Kehre ${k+1}</span></div>
-                <div class="punkte-container">
-                    <div class="button-group">${btnsHtml}</div>
-                    <span class="side-value">${teamBKehren[k] || 0}</span>
-                    <button class="side-del">🗑️</button>
-                </div>
-            `;
-            cardB.querySelectorAll('.side-punkt').forEach(btn => {
-                const val = parseInt(btn.getAttribute('data-val'));
-                btn.addEventListener('click', () => setPoints('B', k, val));
-            });
-            cardB.querySelector('.side-del').addEventListener('click', () => deletePoints('B', k));
-            rightPanel.appendChild(cardB);
-        }
-        updateRowColorsAndKehrenBackground();
-    }
-    
-    function speakText(text) {
-        if (!speechEnabled) return;
-        if ('speechSynthesis' in window) {
-            try { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang='de-DE'; u.rate=0.9; window.speechSynthesis.speak(u); } catch(e) {}
-        }
-    }
-    function showToast(msg, duration=2200) {
-        let t = document.getElementById('dynamicToast');
-        if(!t){ t=document.createElement('div'); t.id='dynamicToast'; t.className='toast-msg'; document.body.appendChild(t); }
-        t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',duration);
-    }
-    
-    // SYNC SCROLL LOGIC
-    function setupSyncScroll() {
-        if (!leftPanelEl || !rightPanelEl) return;
-        leftPanelEl.addEventListener('scroll', function(e) {
-            if (isScrollingRight) return;
-            isScrollingLeft = true;
-            rightPanelEl.scrollTop = leftPanelEl.scrollTop;
-            setTimeout(() => { isScrollingLeft = false; }, 50);
-        });
-        rightPanelEl.addEventListener('scroll', function(e) {
-            if (isScrollingLeft) return;
-            isScrollingRight = true;
-            leftPanelEl.scrollTop = rightPanelEl.scrollTop;
-            setTimeout(() => { isScrollingRight = false; }, 50);
-        });
-    }
-    
-    document.getElementById('applyConfigBtn').onclick = applyConfiguration;
-    document.getElementById('teamANameSide').oninput = (e) => { teamAName = e.target.value.trim() || "Mannschaft W"; renderFullPanels(); updateCenterUI(); };
-    document.getElementById('teamBNameSide').oninput = (e) => { teamBName = e.target.value.trim() || "Mannschaft E"; renderFullPanels(); updateCenterUI(); };
-    document.getElementById('speechToggleSide').onchange = (e) => speechEnabled = e.target.checked;
-    document.getElementById('winGameBtn').onclick = winGameHandler;
-    document.getElementById('resetRoundBtn').onclick = resetRound;
-    document.getElementById('newGameBtn').onclick = fullGameReset;
-    document.getElementById('resetTotalBtn').onclick = resetScoreOnly;
-    document.getElementById('printPDFBtn').onclick = () => window.print();
-    
-    function init() {
-        anzahlKehren = 6; maxPunkteProKehre = 6;
-        initDataStructures();
-        gamesWonA = 0; gamesWonB = 0; overallWinner = false;
-        teamAName = "Mannschaft W"; teamBName = "Mannschaft E";
-        document.getElementById('teamANameSide').value = teamAName;
-        document.getElementById('teamBNameSide').value = teamBName;
-        document.getElementById('kehrenSelect').value = "6";
-        document.getElementById('stockPunkteSelect').value = "6";
-        speechEnabled = true;
-        document.getElementById('speechToggleSide').checked = true;
-        renderFullPanels();
-        updateCenterUI();
-        setupSyncScroll();
-    }
-    init();
+
+    // ---- Selector Events ----
+    document.getElementById('kehrenSelect').addEventListener('change', function(e) {
+      if (state.arena.finished) {
+        toast('Spiel beendet – Reset für neue Kehrenanzahl');
+        return;
+      }
+      const newVal = Number(e.target.value);
+      state.kehren = newVal;
+      const a = state.arena;
+      while (a.pointsA.length < newVal) a.pointsA.push(null);
+      while (a.pointsB.length < newVal) a.pointsB.push(null);
+      a.pointsA.length = newVal;
+      a.pointsB.length = newVal;
+      render();
+    });
+
+    document.getElementById('gamesSelect').addEventListener('change', function(e) {
+      if (state.arena.finished) {
+        toast('Spiel beendet – Reset für neue Sieganzahl');
+        return;
+      }
+      state.winsToChampion = Number(e.target.value);
+      render();
+    });
+
+    // ---- Start ----
+    render();
+
+    setInterval(() => {
+      if (spectatorWindow && !spectatorWindow.closed) updateSpectatorWindow();
+    }, 2200);
+
+  })();
 </script>
 </body>
 </html>

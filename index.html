@@ -287,9 +287,22 @@
       transition: 0.05s;
     }
 
+    /* Aktive Kehre (grün) */
     .kehre-row.active-kehre {
-      background: #e8f5e0;
-      border-left-color: #2f8a4a;
+      background: #d4edda;
+      border-left-color: #28a745;
+    }
+
+    /* Gespielte Kehre (rot) – beide Teams haben einen Wert */
+    .kehre-row.played-kehre {
+      background: #f8d7da;
+      border-left-color: #dc3545;
+    }
+
+    /* Leere Kehre (neutral) */
+    .kehre-row.empty-kehre {
+      background: #f3f8f0;
+      border-left-color: transparent;
     }
 
     .kehre-nr {
@@ -385,6 +398,123 @@
       background: #d08080;
     }
 
+    .action-btn.correction {
+      background: #b8d4e8;
+      border-color: #6a9ec0;
+      color: #1a3d5a;
+    }
+
+    .action-btn.correction:active {
+      background: #8db8d4;
+    }
+
+    /* Modal für Kehren-Korrektur (vereinfacht) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 32px;
+      padding: 30px 28px 24px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+      animation: fadeIn 0.15s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-box h3 {
+      font-size: 1.4rem;
+      color: #1f3d28;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .modal-box p {
+      color: #1f452b;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .modal-box label {
+      display: block;
+      font-weight: 700;
+      color: #1f452b;
+      margin: 12px 0 4px;
+      font-size: 0.9rem;
+    }
+
+    .modal-box select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 40px;
+      border: 2px solid #d3e2ce;
+      font-size: 1rem;
+      background: white;
+      outline: none;
+      transition: 0.08s;
+    }
+
+    .modal-box select:focus {
+      border-color: #2f7852;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: flex-end;
+    }
+
+    .modal-actions button {
+      padding: 10px 24px;
+      border-radius: 40px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.08s;
+    }
+
+    .modal-actions button:active {
+      transform: scale(0.95);
+    }
+
+    .modal-actions .btn-confirm {
+      background: #c0392b;
+      color: white;
+    }
+
+    .modal-actions .btn-confirm:active {
+      background: #a93226;
+    }
+
+    .modal-actions .btn-cancel {
+      background: #e8e8e8;
+      color: #333;
+    }
+
+    .modal-actions .btn-cancel:active {
+      background: #d0d0d0;
+    }
+
     .toast {
       position: fixed;
       bottom: 20px;
@@ -449,6 +579,7 @@
       .kehre-row { grid-template-columns: 28px 1fr 24px; }
       .action-btn { padding: 8px 12px; font-size: 0.8rem; min-width: 70px; }
       .team-names input { font-size: 0.85rem; padding: 8px 10px; }
+      .modal-box { padding: 20px 16px; }
     }
 
     @media (max-width: 400px) {
@@ -496,15 +627,6 @@
       return '';
     }
 
-    function activeKehre() {
-      for (let i = 0; i < arena.kehren; i++) {
-        if (arena.pointsA[i] === null || arena.pointsB[i] === null) {
-          return i + 1;
-        }
-      }
-      return arena.kehren;
-    }
-
     function toast(msg) {
       toastEl.textContent = msg;
       toastEl.classList.add('show');
@@ -526,7 +648,8 @@
         maxPoints: 4,
         playerCount: 4,
         kehren: 6,
-        winsToChampion: 2
+        winsToChampion: 2,
+        gameFinished: false
       };
     }
 
@@ -536,19 +659,47 @@
       bindEvents();
     }
 
+    // Ermittelt, welche Kehre als nächstes dran ist (erste nicht vollständige)
+    function getActiveKehreIndex() {
+      for (let i = 0; i < arena.kehren; i++) {
+        // Eine Kehre gilt als gespielt, wenn beide Teams Werte haben (auch 0)
+        const played = (arena.pointsA[i] !== null && arena.pointsB[i] !== null);
+        if (!played) {
+          return i;
+        }
+      }
+      return arena.kehren; // alle gespielt
+    }
+
+    // Prüft, ob eine Kehre gespielt ist (beide Teams haben Werte)
+    function isKehrePlayed(index) {
+      return (arena.pointsA[index] !== null && arena.pointsB[index] !== null);
+    }
+
     function renderArena() {
       const scoreA = sum(arena.pointsA);
       const scoreB = sum(arena.pointsB);
       const isWinner = hasWinner();
       const maxP = arena.maxPoints;
+      const activeIdx = getActiveKehreIndex();
 
       let kehrenHtmlA = '';
       for (let i = 0; i < arena.kehren; i++) {
         const val = arena.pointsA[i] !== null ? arena.pointsA[i] : '-';
-        const active = activeKehre();
-        const actClass = (i + 1 === active) ? 'active-kehre' : '';
+        const played = isKehrePlayed(i);
+        const isActive = (i === activeIdx && !played && activeIdx < arena.kehren);
+
+        let rowClass = 'kehre-row';
+        if (played) {
+          rowClass += ' played-kehre';
+        } else if (isActive) {
+          rowClass += ' active-kehre';
+        } else {
+          rowClass += ' empty-kehre';
+        }
+
         kehrenHtmlA += `
-          <div class="kehre-row ${actClass}">
+          <div class="${rowClass}">
             <div class="kehre-nr">${i+1}</div>
             <div class="punkte-buttons">
               ${Array.from({length: maxP + 1}, (_, v) => `
@@ -566,10 +717,20 @@
       let kehrenHtmlB = '';
       for (let i = 0; i < arena.kehren; i++) {
         const val = arena.pointsB[i] !== null ? arena.pointsB[i] : '-';
-        const active = activeKehre();
-        const actClass = (i + 1 === active) ? 'active-kehre' : '';
+        const played = isKehrePlayed(i);
+        const isActive = (i === activeIdx && !played && activeIdx < arena.kehren);
+
+        let rowClass = 'kehre-row';
+        if (played) {
+          rowClass += ' played-kehre';
+        } else if (isActive) {
+          rowClass += ' active-kehre';
+        } else {
+          rowClass += ' empty-kehre';
+        }
+
         kehrenHtmlB += `
-          <div class="kehre-row ${actClass}">
+          <div class="${rowClass}">
             <div class="kehre-nr">${i+1}</div>
             <div class="punkte-buttons">
               ${Array.from({length: maxP + 1}, (_, v) => `
@@ -582,6 +743,14 @@
             <div class="kehre-wert">${val}</div>
           </div>
         `;
+      }
+
+      // Info: aktuelle Kehre anzeigen
+      let aktKehreText = '';
+      if (activeIdx < arena.kehren) {
+        aktKehreText = `Aktuelle Kehre: ${activeIdx + 1}`;
+      } else {
+        aktKehreText = 'Alle Kehren gespielt';
       }
 
       return `
@@ -626,7 +795,9 @@
 
           <div class="info-strip">
             <span>🏆 ${arena.winsA} : ${arena.winsB}</span>
+            <span>🔄 ${aktKehreText}</span>
             ${isWinner ? `<span class="champ-badge">🏆 ${winnerName()}</span>` : ''}
+            ${arena.gameFinished ? `<span class="champ-badge" style="background:#a0c8e8;">⏳ manuelle Wertung</span>` : ''}
           </div>
 
           <div class="kehren-grid">
@@ -642,8 +813,9 @@
 
           <div class="action-row">
             <button class="action-btn gold evaluateBtn">🏆 Spiel werten</button>
-            <button class="action-btn resetKehrenBtn">↺ Kehren</button>
-            <button class="action-btn reset-game resetGameBtn">🔄 Spiel neu</button>
+            <button class="action-btn correction correctionBtn">✏️ Kehre korrigieren</button>
+            <button class="action-btn resetKehrenBtn">↺ Nächstes Spiel starten</button>
+            <button class="action-btn reset-game resetGameBtn">🔄 Neuen Durchgang</button>
           </div>
         </div>
       `;
@@ -653,7 +825,7 @@
       const card = document.querySelector('.arena-card');
       if (!card) return;
 
-      // Punkte-Buttons
+      // Punkte-Buttons – direkte Eingabe / Korrektur
       card.querySelectorAll('.punkte-buttons button').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -686,6 +858,7 @@
         arena.kehren = newK;
         arena.pointsA = Array(newK).fill(null);
         arena.pointsB = Array(newK).fill(null);
+        arena.gameFinished = false;
         renderAll();
         toast('Kehren: ' + newK);
       });
@@ -696,43 +869,105 @@
         renderAll();
       });
 
-      // Reset Arena
+      // Reset Arena (nur Kehren + Siege)
       card.querySelector('.resetArenaBtn').addEventListener('click', function() {
         if (!confirm('Bahn 1 zurücksetzen?')) return;
         arena.winsA = 0;
         arena.winsB = 0;
         arena.pointsA = Array(arena.kehren).fill(null);
         arena.pointsB = Array(arena.kehren).fill(null);
+        arena.gameFinished = false;
         renderAll();
         toast('↺ Bahn 1 zurückgesetzt');
       });
 
-      // Evaluate
+      // Evaluate – manuelle Wertung (immer manuell, keine Automatik)
       card.querySelector('.evaluateBtn').addEventListener('click', function() {
         evaluateGame();
       });
 
-      // Reset Kehren
-      card.querySelector('.resetKehrenBtn').addEventListener('click', function() {
-        if (hasWinner()) {
-          toast('🏆 Training beendet – mit "Spiel neu" zurücksetzen');
-          return;
-        }
-        arena.pointsA = Array(arena.kehren).fill(null);
-        arena.pointsB = Array(arena.kehren).fill(null);
-        renderAll();
-        toast('Kehren gelöscht');
+      // Korrektur-Button: öffnet vereinfachtes Modal mit nur Kehren-Auswahl
+      card.querySelector('.correctionBtn').addEventListener('click', function() {
+        showCorrectionModal();
       });
 
-      // Reset Game
+      // Reset Kehren – löscht alle Kehren (nicht die Siege)
+      card.querySelector('.resetKehrenBtn').addEventListener('click', function() {
+        arena.pointsA = Array(arena.kehren).fill(null);
+        arena.pointsB = Array(arena.kehren).fill(null);
+        arena.gameFinished = false;
+        renderAll();
+        toast('Alle Kehren gelöscht');
+      });
+
+      // Reset Game – kompletter Neustart
       card.querySelector('.resetGameBtn').addEventListener('click', function() {
         if (!confirm('Bahn 1 wirklich komplett zurücksetzen?')) return;
         arena.winsA = 0;
         arena.winsB = 0;
         arena.pointsA = Array(arena.kehren).fill(null);
         arena.pointsB = Array(arena.kehren).fill(null);
+        arena.gameFinished = false;
         renderAll();
         toast('🔄 Bahn 1 neu gestartet');
+      });
+    }
+
+    // Vereinfachtes Modal: nur Auswahl der Kehre, die gelöscht werden soll
+    function showCorrectionModal() {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.id = 'correctionModal';
+
+      let optionsHtml = '';
+      for (let i = 0; i < arena.kehren; i++) {
+        const valA = arena.pointsA[i] !== null ? arena.pointsA[i] : '-';
+        const valB = arena.pointsB[i] !== null ? arena.pointsB[i] : '-';
+        const bothNull = (arena.pointsA[i] === null && arena.pointsB[i] === null);
+        const label = bothNull ? `Kehre ${i+1} (leer)` : `Kehre ${i+1} (A: ${valA} | B: ${valB})`;
+        optionsHtml += `<option value="${i}">${label}</option>`;
+      }
+
+      overlay.innerHTML = `
+        <div class="modal-box">
+          <h3>✏️ Kehre korrigieren</h3>
+          <p>Wähle die Kehre, die zurückgesetzt werden soll.</p>
+          <label for="kehreSelect">Kehre auswählen:</label>
+          <select id="kehreSelect">
+            ${optionsHtml}
+          </select>
+          <div class="modal-actions">
+            <button class="btn-cancel" id="modalCancel">Abbrechen</button>
+            <button class="btn-confirm" id="modalConfirm">Kehre löschen</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+
+      // Events für Modal
+      document.getElementById('modalCancel').addEventListener('click', function() {
+        overlay.remove();
+      });
+
+      document.getElementById('modalConfirm').addEventListener('click', function() {
+        const kehreIndex = parseInt(document.getElementById('kehreSelect').value);
+
+        // Beide Teams auf null setzen
+        arena.pointsA[kehreIndex] = null;
+        arena.pointsB[kehreIndex] = null;
+
+        arena.gameFinished = false;
+        overlay.remove();
+        renderAll();
+        toast('✅ Kehre ' + (kehreIndex+1) + ' wurde gelöscht');
+      });
+
+      // Klick auf Overlay schließt nicht, nur über Button
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+          overlay.remove();
+        }
       });
     }
 
@@ -741,16 +976,13 @@
       arena.maxPoints = newCount;
       arena.pointsA = Array(arena.kehren).fill(null);
       arena.pointsB = Array(arena.kehren).fill(null);
+      arena.gameFinished = false;
       renderAll();
       toast('⭐ ' + newCount + ' Spieler → ' + newCount + ' Punkte max.');
     }
 
+    // setPoints – KEINE automatische Wertung mehr
     function setPoints(team, index, value) {
-      if (hasWinner()) {
-        toast('🏆 Training entschieden!');
-        return;
-      }
-
       if (team === 'A') {
         arena.pointsA[index] = value;
         if (arena.pointsB[index] === null) arena.pointsB[index] = 0;
@@ -759,31 +991,16 @@
         if (arena.pointsA[index] === null) arena.pointsA[index] = 0;
       }
 
+      arena.gameFinished = false;
       renderAll();
-
-      let allFilled = true;
-      for (let i = 0; i < arena.kehren; i++) {
-        if (arena.pointsA[i] === null || arena.pointsB[i] === null) {
-          allFilled = false;
-          break;
-        }
-      }
-      if (allFilled && !hasWinner()) {
-        setTimeout(() => { evaluateGame(); }, 200);
-      }
     }
 
+    // Manuelle Wertung – immer manuell, keine automatische Prüfung
     function evaluateGame() {
-      if (hasWinner()) {
-        toast('🏆 Training bereits beendet');
-        return;
-      }
-
+      // Fehlende Kehren mit 0 auffüllen (damit immer gewertet werden kann)
       for (let i = 0; i < arena.kehren; i++) {
-        if (arena.pointsA[i] === null || arena.pointsB[i] === null) {
-          toast('Alle Kehren ausfüllen');
-          return;
-        }
+        if (arena.pointsA[i] === null) arena.pointsA[i] = 0;
+        if (arena.pointsB[i] === null) arena.pointsB[i] = 0;
       }
 
       const aSum = sum(arena.pointsA);
@@ -799,8 +1016,7 @@
         toast('⚖️ Unentschieden (' + aSum + ':' + bSum + ')');
       }
 
-      arena.pointsA = Array(arena.kehren).fill(null);
-      arena.pointsB = Array(arena.kehren).fill(null);
+      arena.gameFinished = true;
 
       if (hasWinner()) {
         toast('🏆 ' + winnerName() + ' gewinnt das Training!');
@@ -815,6 +1031,7 @@
       arena.winsB = 0;
       arena.pointsA = Array(arena.kehren).fill(null);
       arena.pointsB = Array(arena.kehren).fill(null);
+      arena.gameFinished = false;
       renderAll();
       toast('↺ Bahn 1 zurückgesetzt');
     }
@@ -823,6 +1040,7 @@
       arena = createArena();
       arena.pointsA = Array(arena.kehren).fill(null);
       arena.pointsB = Array(arena.kehren).fill(null);
+      arena.gameFinished = false;
       renderAll();
       document.getElementById('resetAllBtn').addEventListener('click', resetAll);
     }

@@ -2,41 +2,1235 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Zugang – Trainingsportal ESV Grein</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>Trainingsmodus Pro – Tablet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --green:#1f5e3a;
+    --red:#b93a32;
+    --gold:#ffdf8c;
+    --dark:#102417;
+    --light:#eef5e9;
+    --border:#d7e4cf;
+
+    --bg-main:#0a0e14;
+    --bg-panel:#131b24;
+    --line:rgba(255,255,255,0.08);
+    --text-main:#eef2f6;
+    --text-dim:#8a97a6;
+    --accent:#33c5ff;
+    --accent-hover:#5fd4ff;
+    --font-display:"Space Grotesk","Inter",sans-serif;
+    --font-body:"Inter",Segoe UI,Arial,sans-serif;
+
+    --w-color:#4caf50;
+    --e-color:#ff6b6b;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+body{
+    font-family:var(--font-body);
+    background:linear-gradient(160deg,var(--bg-main),#0a0d12);
+    color:var(--text-main);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.header{
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background:var(--bg-panel);
+    border-bottom:1px solid var(--line);
+    color:var(--text-main);
+    padding:8px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    flex-shrink:0;
+}
+
+.header h1{
+    font-family:var(--font-display);
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    font-size:1.4rem;
+    color:var(--text-main);
+}
+.header h1::before{
+    content:"Modul 05";
+    display:block;
+    font-family:var(--font-body);
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    font-size:10px;
+    color:var(--accent);
+    font-weight:700;
+}
+
+.header-controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+
+button,
+select,
+input{
+    border:none;
+    border-radius:20px;
+    padding:9px 13px;
+    font-size:0.95rem;
+    touch-action: manipulation;
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+    background:var(--accent);
+    color:white;
+    font-weight:700;
+    touch-action: manipulation;
+    transition: transform 0.1s, background 0.15s;
+}
+button:hover{
+    background:var(--accent-hover);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.header-controls select{
+    background:#1c2734;
+    color:var(--text-main);
+    border:1px solid var(--line);
+    font-weight:600;
+    font-size:0.85rem;
+    padding:8px 10px;
+}
+
+.keyboard-status {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #1c2734;
+    color: var(--text-main);
+    font-weight: 700;
+    border:1px solid var(--line);
+    white-space:nowrap;
+}
+
+.keyboard-status.waiting { background: #7a6a00; }
+.keyboard-status.team-e { background: var(--e-color); color:#2a0505; }
+.keyboard-status.team-w { background: var(--w-color); color:#062b09; }
+.keyboard-status.training-ended { background: #9c27b0; color:#fff; }
+.keyboard-status.pending { background: var(--gold); color:#332400; animation: blink 0.8s ease-in-out infinite; }
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+}
+
+.layout{
+    flex: 1;
+    padding:14px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* ===== ARENA (Hauptbildschirm = Zuschauermonitor-Layout) ===== */
+.arena{
+    width:100%;
+    max-width:1900px;
+    height:100%;
+    background:linear-gradient(165deg,#132a1d,#0a1810);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:24px;
+    overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,.4);
+    display:flex;
+    flex-direction:column;
+    margin: 0 auto;
+    padding:16px 20px;
+    gap:12px;
+    color:#fff;
+}
+
+.arena-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    flex-shrink:0;
+}
+
+.arena-title{
+    font-family:var(--font-display);
+    font-size:1.6rem;
+    font-weight:900;
+    color:var(--gold);
+    letter-spacing:1px;
+}
+
+.arena-hint{
+    font-size:0.8rem;
+    color:#8aa89a;
+    background:rgba(255,255,255,0.05);
+    padding:6px 14px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.06);
+}
+
+.pending-preview{
+    font-size:0.85rem;
+    font-weight:800;
+    padding:6px 14px;
+    border-radius:20px;
+    background:var(--gold);
+    color:#332400;
+    display:none;
+}
+.pending-preview.show{ display:inline-block; animation: blink 0.8s ease-in-out infinite; }
+
+/* ===== TEAMS ROW ===== */
+.teams-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:16px;
+    flex-shrink:0;
+    align-items:start;
+}
+
+.team-column{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* ===== ZIFFERNBLOCK (Tablet-Touch-Eingabe je Mannschaft) ===== */
+.keypad-panel{
+    background:#0a1810;
+    border-radius:18px;
+    padding:10px;
+    border:1px solid rgba(255,255,255,0.06);
+}
+.keypad-grid{
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap:8px;
+}
+.keypad-btn{
+    background:#14261c;
+    color:var(--text-main);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;
+    font-size:1.5rem;
+    font-weight:800;
+    padding:16px 0;
+    cursor:pointer;
+    touch-action:manipulation;
+    transition: transform 0.1s, background 0.15s;
+}
+.keypad-btn:active{ transform:scale(0.93); background:#1c362a; }
+.keypad-btn:disabled{ opacity:0.3; cursor:default; }
+.keypad-btn:disabled:active{ transform:none; background:#14261c; }
+.team-column.w .keypad-btn:active{ background:#1c3d24; border-color:var(--w-color); }
+.team-column.e .keypad-btn:active{ background:#3d1c1c; border-color:var(--e-color); }
+
+.team-block{
+    background:#0f1f17;
+    border-radius:20px;
+    padding:16px;
+    border-bottom:8px solid var(--w-color);
+    box-shadow:0 6px 0 rgba(0,0,0,.25);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition: all 0.25s ease;
+    cursor:pointer;
+}
+.team-block.e{ border-bottom-color:var(--e-color); }
+
+.team-block.selected{
+    transform: scale(1.015);
+}
+.team-block.w.selected{
+    background:#123320;
+    box-shadow:0 0 0 3px var(--w-color), 0 6px 0 rgba(0,0,0,.25);
+}
+.team-block.e.selected{
+    background:#331414;
+    box-shadow:0 0 0 3px var(--e-color), 0 6px 0 rgba(0,0,0,.25);
+}
+
+.team-block.flash{
+    animation: teamFlash 0.6s ease;
+}
+@keyframes teamFlash {
+    0%{ box-shadow:0 0 0 rgba(255,255,255,0); }
+    35%{ box-shadow:0 0 45px 12px rgba(255,255,255,0.55); }
+    100%{ box-shadow:0 0 0 rgba(255,255,255,0); }
+}
+
+.team-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+}
+
+.team-label{
+    font-weight:900;
+    font-size:1.7rem;
+    letter-spacing:0.5px;
+}
+.team-label .key-hint{ font-size:0.78rem; color:#8aa89a; font-weight:600; display:block; }
+
+.team-wins-big {
+    font-size: 1.3rem;
+    background: rgba(255,255,255,0.08);
+    color: var(--gold);
+    padding: 7px 18px;
+    border-radius: 40px;
+    font-weight: 800;
+    border: 1px solid rgba(255,223,140,0.2);
+    white-space:nowrap;
+}
+
+/* Ergebnis-Anzeige: auf dem Tablet etwas kompakter als am Zuschauermonitor,
+   damit unter jeder Mannschaft noch genug Platz für den Ziffernblock bleibt. */
+.team-score-big {
+    font-size: clamp(3.5rem, 11vh, 7rem);
+    font-weight: 900;
+    color: var(--w-color);
+    line-height: 1;
+    text-shadow: 0 4px 30px rgba(76,175,80,0.35);
+    text-align:center;
+    padding: 4px 0;
+}
+.team-block.e .team-score-big { color: var(--e-color); text-shadow: 0 4px 20px rgba(255,107,107,0.3); }
+
+/* ===== EINGABE-HINWEIS (externes Tastenfeld, kein Bildschirm-Ziffernblock) ===== */
+.input-hint-panel{
+    background:#0a1810;
+    border-radius:20px;
+    padding:14px;
+    border:1px solid rgba(255,255,255,0.06);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+.input-hint-status{
+    font-size:1rem;
+    font-weight:800;
+    color:#eef2f6;
+}
+.input-hint-keys{
+    font-size:0.78rem;
+    color:#8aa89a;
+    line-height:1.6;
+}
+.input-hint-keys kbd{
+    background:#1c2734;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:6px;
+    padding:2px 7px;
+    font-family:inherit;
+    font-weight:700;
+    color:#eef2f6;
+}
+
+/* ===== KEHREN-VERLAUF (unterer Bereich, etwas wichtiger als die Historie) ===== */
+.kehren-verlauf-panel{
+    background:#0a1810;
+    border-radius:18px;
+    padding:12px 16px;
+    border:1px solid rgba(255,255,255,0.06);
+    flex:1.3 1 0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.kehren-verlauf-panel h4{
+    color:#8aa89a;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-weight:700;
+    flex-shrink:0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.kehren-verlauf-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap:10px;
+    overflow-y:auto;
+    padding:2px;
+    min-height:0;
+}
+
+.verlauf-item{
+    background:#14261c;
+    border-radius:12px;
+    padding:8px 4px;
+    text-align:center;
+    border:2px solid rgba(255,255,255,0.06);
+    cursor:pointer;
+    transition:0.15s;
+}
+.verlauf-item:hover{ border-color:rgba(255,255,255,0.2); }
+.verlauf-item.is-active{
+    border-color:var(--accent);
+    box-shadow:0 0 16px rgba(51,197,255,0.25);
+}
+.verlauf-item.is-completed{
+    border-color:#ff9800;
+}
+.verlauf-item.is-target{
+    border-color:var(--gold);
+    box-shadow:0 0 18px rgba(255,223,140,0.35);
+    background:#241f0d;
+}
+
+.verlauf-item .v-number{ font-weight:700; color:#8aa89a; font-size:0.8rem; }
+.verlauf-item .v-points{
+    font-weight:900;
+    display:flex;
+    justify-content:space-around;
+    font-size:1.15rem;
+    margin-top:2px;
+}
+.verlauf-item .v-points .w{ color:var(--w-color); }
+.verlauf-item .v-points .e{ color:var(--e-color); }
+.verlauf-item .v-scorer{
+    font-size:0.6rem;
+    color:#65796d;
+    margin-top:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* ===== FOOTER-ROW (im arena) ===== */
+.arena-footer{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    flex-shrink:0;
+}
+.arena-footer button{
+    padding:10px 18px;
+    font-size:0.85rem;
+}
+.arena-footer .footer-right {
+    font-size:0.72rem;
+    color:#65796d;
+    margin-left:auto;
+}
+
+/* ===== TRAINING BEENDET / MODALS (unverändert-ähnlich) ===== */
+.training-ended-overlay {
+    position: fixed; inset:0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 20000;
+    backdrop-filter: blur(5px);
+}
+.training-ended-overlay.show { display: flex; }
+.training-ended-box {
+    background: white; color:#222;
+    border-radius: 30px;
+    padding: 50px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    animation: pulse 1.5s ease-in-out;
+}
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+.training-ended-box .trophy { font-size: 4rem; margin-bottom: 10px; }
+.training-ended-box h2 { font-size: 2rem; margin-bottom: 10px; color: var(--green); }
+.training-ended-box .winner-name { font-size: 2.5rem; font-weight: 900; color: var(--red); margin: 15px 0; }
+.training-ended-box .score-summary { font-size: 1.2rem; color: #555; margin: 10px 0 20px; }
+.training-ended-box .enter-hint { font-size: 0.9rem; color: #888; margin-top: 10px; padding: 8px; background: #f5f5f5; border-radius: 8px; }
+.training-ended-box button { padding: 12px 30px; font-size: 1.1rem; background: var(--green); color: white; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; }
+
+.toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:#111; color:white; padding:14px 20px; border-radius:14px;
+    opacity:0; transition:.3s; z-index:9999; pointer-events: none;
+    font-size:1rem; max-width:90%; text-align:center;
+}
+.toast.show{ opacity:1; }
+.toast.winner{ background: #4caf50; font-weight:700; font-size:1.2rem; }
+.toast.warn{ background: #b93a32; font-weight:700; }
+
+
+.gold{ background:var(--gold); color:black; }
+.gold:active{ background:#f0c860; }
+
+/* ===== RESPONSIVE =====
+   Die beiden Mannschaftsspalten (Team + eigener Ziffernblock) bleiben bewusst bis zu
+   sehr schmalen Breiten nebeneinander (Tablets im Hoch- wie Querformat) - anders als
+   beim ursprünglichen Zuschauermonitor-Layout gibt es hier keine seitlichen
+   Aufstellung-Panels mehr, die bei wenig Platz zuerst weichen müssten. */
+@media (max-width: 900px){
+    .team-score-big{ font-size:3.2rem; }
+    .keypad-btn{ font-size:1.2rem; padding:12px 0; }
+}
+
+@media (max-width: 620px){
+    .teams-row{ grid-template-columns: 1fr; }
+    .header h1{ font-size:1.1rem; }
+    .arena{ padding:10px; border-radius:16px; }
+    .team-score-big{ font-size:2.6rem; }
+    .kehren-verlauf-grid{ grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
+}
+</style>
 </head>
 <body>
-<div class="wrap">
-  <p class="eyebrow">Geschützter Bereich</p>
-  <h1>Zugangscode</h1>
-  <p class="lead">Bitte gib den Zugangscode ein, um zum Trainingsportal zu gelangen.</p>
 
-  <div class="card">
-    <label for="pw">Passwort</label>
-    <input type="password" id="pw" placeholder="••••••••">
-    <p class="error" id="err"></p>
-    <button onclick="checkPassword()">Weiter</button>
-  </div>
+<div class="header">
+    <h1>Trainingsmodus Pro</h1>
+
+    <div class="header-controls">
+        <span class="keyboard-status" id="keyboardStatus">🔑 Bereit</span>
+
+        <select id="gamesSelect">
+            <option value="2" selected>2 Siege</option>
+            <option value="3">3 Siege</option>
+            <option value="4">4 Siege</option>
+            <option value="5">5 Siege</option>
+            <option value="6">6 Siege</option>
+        </select>
+
+        <select id="kehrenSelect">
+            <option value="4">4 Kehren</option>
+            <option value="6" selected>6 Kehren</option>
+            <option value="8">8 Kehren</option>
+            <option value="10">10 Kehren</option>
+        </select>
+
+        <select id="playerCount">
+            <option value="3">3 Spieler/Kehre</option>
+            <option value="4" selected>4 Spieler/Kehre</option>
+            <option value="5">5 Spieler/Kehre</option>
+            <option value="6">6 Spieler/Kehre</option>
+        </select>
+
+        <button onclick="toggleFullscreen()" title="Vollbild ein/aus">⛶</button>
+        <button onclick="fullReset()" style="background:#b93a32;" title="Kompletter Reset">↺</button>
+    </div>
 </div>
 
-<script src="auth.js"></script>
+<div class="layout" id="layout"></div>
+
+<!-- Training beendet Overlay -->
+<div class="training-ended-overlay" id="trainingEndedOverlay">
+    <div class="training-ended-box">
+        <div class="trophy">🏆</div>
+        <h2>Training beendet!</h2>
+        <div class="winner-name" id="winnerName">Mannschaft W</div>
+        <div class="score-summary" id="scoreSummary">Siege: 2 : 0</div>
+        <div class="enter-hint">Antippen Sie „Neues Training starten“ für den nächsten Durchgang</div>
+        <button onclick="startNewTraining()">Neues Training starten</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Eigenständiges Einzelprogramm für Tablets: kein Verweis auf das Dashboard/Portal,
+     keine Zugangssperre (requireGate()/requireLogin() werden bewusst nicht aufgerufen) -
+     sofort einsatzbereit, ohne weitere Module. -->
 <script>
-  if (typeof PROTECTION_ENABLED !== "undefined" && !PROTECTION_ENABLED) {
-    location.href = "dashboard.html";
-  }
-  document.getElementById("pw").addEventListener("keydown", e => {
-    if (e.key === "Enter") checkPassword();
-  });
-  function checkPassword() {
-    const val = document.getElementById("pw").value;
-    if (val === SITE_PASSWORD) {
-      sessionStorage.setItem("gateOpen", "yes");
-      location.href = "login.html";
-    } else {
-      document.getElementById("err").textContent = "Falsches Passwort.";
+const PENDING_DIGIT_TIMEOUT = 650;
+
+// ===== STATE =====
+const state = {
+    kehren: 6,
+    winsToChampion: 2,
+    playerCount: 4,
+    arena: null,                    // wird gleich nach der Deklaration gesetzt (siehe unten)
+    selectedTeam: null,             // 'w' | 'e' | null
+    isTrainingEnded: false,
+    targetKehre: null,              // manuell angetippte Kehre (Korrektur), sonst null = automatisch
+    pendingDigit: null              // { digit, timeoutId } für 2-stellige Eingabe (z.B. "10")
+};
+// createArena() liest state.kehren, daher erst NACH der obigen Deklaration aufrufen
+// (sonst "Cannot access 'state' before initialization").
+state.arena = createArena();
+
+// ===== KEYBOARD (optional – z.B. externe Tastatur/Nummernblock am Raspberry) =====
+function setupKeyboard() {
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === 'NumpadEnter') {
+            e.preventDefault();
+            if (state.isTrainingEnded) {
+                startNewTraining();
+                toast('🔄 Neues Training gestartet!');
+            } else {
+                evaluateGame();
+            }
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            if (state.pendingDigit) {
+                e.preventDefault();
+                cancelPendingDigit();
+                return;
+            }
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+            return;
+        }
+
+        if (state.isTrainingEnded) return;
+
+        if (e.key === '/' || e.key === 'Divide' || e.code === 'NumpadDivide') {
+            e.preventDefault();
+            deleteKehreEntry();
+            return;
+        }
+
+        if (e.key === '-' || e.key === 'Minus' || e.key === 'Subtract') {
+            e.preventDefault();
+            selectTeam('e');
+            return;
+        }
+
+        if (e.key === '+' || e.key === 'Plus' || e.key === 'Add' || e.key === '=') {
+            e.preventDefault();
+            selectTeam('w');
+            return;
+        }
+
+        const numMap = {
+            'Numpad0':'0','Numpad1':'1','Numpad2':'2','Numpad3':'3','Numpad4':'4',
+            'Numpad5':'5','Numpad6':'6','Numpad7':'7','Numpad8':'8','Numpad9':'9'
+        };
+        if (/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+            handleDigit(e.key);
+            return;
+        }
+        if (numMap[e.key]) {
+            e.preventDefault();
+            handleDigit(numMap[e.key]);
+            return;
+        }
+    });
+}
+
+// ===== TEAM AUSWAHL =====
+function selectTeam(team) {
+    if (state.isTrainingEnded) {
+        toast('Training ist beendet! „Neues Training starten“ antippen');
+        return;
     }
-  }
+    state.selectedTeam = (state.selectedTeam === team) ? null : team;
+    updateKeyboardStatus();
+    render();
+    if (state.selectedTeam) {
+        flashTeam(state.selectedTeam);
+    }
+}
+
+function flashTeam(team) {
+    requestAnimationFrame(() => {
+        const el = document.getElementById('teamBlock-' + team);
+        if (!el) return;
+        el.classList.remove('flash');
+        // reflow um die Animation erneut zu starten
+        void el.offsetWidth;
+        el.classList.add('flash');
+        setTimeout(() => el.classList.remove('flash'), 650);
+    });
+}
+
+// ===== ZIFFERNEINGABE (Kehren-Ergebnis: 1- oder 2-stellig) =====
+// tapDigit() verbindet Mannschaft-Wahl + Ziffer in einem Antippen (Touch-Ziffernblock
+// unter jeder Mannschaft) - handleDigit() selbst bleibt unverändert nutzbar
+// (z.B. für eine evtl. angeschlossene externe Tastatur).
+function tapDigit(team, digit) {
+    if (state.isTrainingEnded) {
+        toast('Training ist beendet! Bitte „Neues Training starten“ antippen');
+        return;
+    }
+    if (state.selectedTeam !== team) {
+        state.selectedTeam = team;
+        flashTeam(team);
+    }
+    handleDigit(digit);
+}
+
+function handleDigit(d) {
+    if (state.isTrainingEnded) {
+        toast('Training ist beendet! „Neues Training starten“ antippen');
+        return;
+    }
+    if (!state.selectedTeam) {
+        toast('⚠️ Bitte zuerst Mannschaft wählen ( + oder − / Kachel antippen)');
+        return;
+    }
+
+    const arena = state.arena;
+    if (hasWinner(arena)) {
+        endTraining(arena);
+        return;
+    }
+
+    const maxPoints = state.playerCount;
+
+    if (state.pendingDigit) {
+        clearTimeout(state.pendingDigit.timeoutId);
+        const first = state.pendingDigit.digit;
+        state.pendingDigit = null;
+        const combined = Number(first + d);
+        if (first === '1' && d === '0' && combined <= maxPoints) {
+            commitValue(combined);
+        } else {
+            commitValue(Number(first));
+            toast('ℹ️ Zweite Ziffer ignoriert – bitte Mannschaft erneut wählen');
+        }
+        render();
+        return;
+    }
+
+    // Möglicher Start einer 2-stelligen Eingabe (aktuell nur relevant für "10")
+    if (d === '1' && maxPoints >= 10) {
+        state.pendingDigit = {
+            digit: d,
+            timeoutId: setTimeout(() => {
+                commitValue(1);
+                render();
+            }, PENDING_DIGIT_TIMEOUT)
+        };
+        render();
+        return;
+    }
+
+    const v = Number(d);
+    if (v > maxPoints) {
+        toast(`⚠️ Maximal ${maxPoints} Punkte pro Kehre möglich`);
+        return;
+    }
+    commitValue(v);
+}
+
+function cancelPendingDigit() {
+    if (state.pendingDigit) {
+        clearTimeout(state.pendingDigit.timeoutId);
+        state.pendingDigit = null;
+        render();
+        toast('Eingabe abgebrochen');
+    }
+}
+
+function activeKehreIndexForEntry() {
+    if (state.targetKehre !== null && state.targetKehre !== undefined) return state.targetKehre;
+    return activeKehre(state.arena) - 1;
+}
+
+function commitValue(v) {
+    const arena = state.arena;
+    const idx = activeKehreIndexForEntry();
+    if (idx < 0 || idx >= state.kehren) return;
+
+    const team = state.selectedTeam;
+    if (team === 'w') {
+        arena.pointsA[idx] = v;
+        if (arena.pointsB[idx] === null) arena.pointsB[idx] = 0;
+    } else {
+        arena.pointsB[idx] = v;
+        if (arena.pointsA[idx] === null) arena.pointsA[idx] = 0;
+    }
+
+    const otherValue = team === 'w' ? arena.pointsB[idx] : arena.pointsA[idx];
+    const teamName = team === 'w' ? 'W' : 'E';
+    const otherName = team === 'w' ? 'E' : 'W';
+
+    state.selectedTeam = null;
+    state.targetKehre = null;
+    updateKeyboardStatus();
+    render();
+
+    toast(`✅ Kehre ${idx + 1}: ${teamName} ${v} | ${otherName} ${otherValue}`);
+
+    if (checkAllKehrenFull(arena)) {
+        setTimeout(() => {
+            toast('📊 Alle Kehren gespielt - Wertung läuft...');
+            setTimeout(() => evaluateGame(), 500);
+        }, 300);
+    }
+}
+
+// ===== KEHRE ANTIPPEN (Korrektur-Ziel wählen) =====
+function toggleKehreTarget(idx) {
+    if (state.isTrainingEnded) return;
+    state.targetKehre = (state.targetKehre === idx) ? null : idx;
+    render();
+}
+
+function getMostRecentCompletedIndex(arena) {
+    for (let i = state.kehren - 1; i >= 0; i--) {
+        if (arena.pointsA[i] !== null || arena.pointsB[i] !== null) return i;
+    }
+    return -1;
+}
+
+function deleteKehreEntry() {
+    if (state.isTrainingEnded) {
+        toast('Training ist beendet! „Neues Training starten“ antippen');
+        return;
+    }
+    const arena = state.arena;
+    let idx = state.targetKehre;
+    if (idx === null || idx === undefined) {
+        idx = getMostRecentCompletedIndex(arena);
+    }
+    if (idx === -1 || idx === null || idx === undefined) {
+        toast('Keine Kehre zum Löschen vorhanden');
+        return;
+    }
+    if (arena.pointsA[idx] === null && arena.pointsB[idx] === null) {
+        toast(`Kehre ${idx + 1} ist bereits leer`);
+        return;
+    }
+    arena.pointsA[idx] = null;
+    arena.pointsB[idx] = null;
+    arena.scorerA[idx] = null;
+    arena.scorerB[idx] = null;
+    state.targetKehre = idx;
+    cancelPendingDigit();
+    toast(`🗑️ Kehre ${idx + 1} gelöscht – bitte neu eingeben`);
+    render();
+}
+
+// ===== SPIEL WERTEN =====
+function evaluateGame() {
+    const arena = state.arena;
+
+    if (state.isTrainingEnded) {
+        toast('Training ist beendet! „Neues Training starten“ antippen');
+        return;
+    }
+
+    if (hasWinner(arena)) {
+        endTraining(arena);
+        return;
+    }
+
+    for (let i = 0; i < state.kehren; i++) {
+        if (arena.pointsA[i] === null || arena.pointsB[i] === null) {
+            toast('Bitte alle Kehren ausfüllen');
+            return;
+        }
+    }
+
+    const a = sum(arena.pointsA);
+    const b = sum(arena.pointsB);
+
+    let gameResult = '';
+    if (a > b) {
+        arena.winsA++;
+        gameResult = `⚪ Mannschaft W gewinnt (${a}:${b})`;
+    } else if (b > a) {
+        arena.winsB++;
+        gameResult = `🔴 Mannschaft E gewinnt (${a}:${b})`;
+    } else {
+        gameResult = `Unentschieden (${a}:${b})`;
+    }
+    toast(gameResult);
+
+    arena.pointsA = Array(state.kehren).fill(null);
+    arena.pointsB = Array(state.kehren).fill(null);
+    arena.scorerA = Array(state.kehren).fill(null);
+    arena.scorerB = Array(state.kehren).fill(null);
+    state.targetKehre = null;
+
+    render();
+
+    if (hasWinner(arena)) {
+        setTimeout(() => endTraining(arena), 1000);
+    } else {
+        setTimeout(() => {
+            toast(`🔄 Neues Spiel beginnt! Stand: W ${arena.winsA} : ${arena.winsB} E`);
+            render();
+        }, 500);
+    }
+}
+
+// ===== TRAINING BEENDEN =====
+function endTraining(arena) {
+    state.isTrainingEnded = true;
+    updateKeyboardStatus();
+
+    const winner = winnerName(arena);
+    const overlay = document.getElementById('trainingEndedOverlay');
+    const winnerEl = document.getElementById('winnerName');
+    const summaryEl = document.getElementById('scoreSummary');
+
+    winnerEl.textContent = winner;
+    winnerEl.style.color = winner === 'Mannschaft W' ? '#4caf50' : '#ff6b6b';
+    summaryEl.textContent = `Siege: ${arena.winsA} : ${arena.winsB}`;
+
+    overlay.classList.add('show');
+
+    const toastEl = document.getElementById('toast');
+    toastEl.textContent = `🏆 ${winner} gewinnt das Training! „Neues Training starten“ antippen`;
+    toastEl.className = 'toast show winner';
+    clearTimeout(toastEl._timeout);
+    toastEl._timeout = setTimeout(() => {
+        toastEl.classList.remove('show');
+        toastEl.className = 'toast';
+    }, 5000);
+}
+
+function startNewTraining() {
+    const overlay = document.getElementById('trainingEndedOverlay');
+    overlay.classList.remove('show');
+
+    state.isTrainingEnded = false;
+    state.arena = createArena();
+    state.selectedTeam = null;
+    state.targetKehre = null;
+    cancelPendingDigit();
+    updateKeyboardStatus();
+    render();
+    toast('🔄 Neues Training gestartet!');
+}
+
+// ===== STATUS UPDATE =====
+function updateKeyboardStatus() {
+    const statusEl = document.getElementById('keyboardStatus');
+
+    if (state.isTrainingEnded) {
+        statusEl.textContent = '🏁 Training beendet - „Neues Training starten“ antippen';
+        statusEl.className = 'keyboard-status training-ended';
+        return;
+    }
+
+    if (state.pendingDigit) {
+        statusEl.textContent = `⌨️ „${state.pendingDigit.digit}…” – 2. Ziffer?`;
+        statusEl.className = 'keyboard-status pending';
+        return;
+    }
+
+    if (state.selectedTeam) {
+        const teamLabel = state.selectedTeam === 'w' ? '⚪ W' : '🔴 E';
+        const idx = activeKehreIndexForEntry();
+        const targetLabel = state.targetKehre !== null ? ` – Korrektur Kehre ${state.targetKehre + 1}` : ` – Kehre ${idx + 1}`;
+        statusEl.textContent = `${teamLabel} ausgewählt${targetLabel} – Punkte eingeben`;
+        statusEl.className = 'keyboard-status ' + (state.selectedTeam === 'w' ? 'team-w' : 'team-e');
+    } else {
+        statusEl.textContent = '🔑 Bereit - Mannschaft antippen oder Ziffernblock verwenden';
+        statusEl.className = 'keyboard-status';
+    }
+}
+
+// ===== RENDER =====
+function render() {
+    document.getElementById('layout').innerHTML = renderArena(state.arena);
+    if (!state.isTrainingEnded) {
+        updateKeyboardStatus();
+    }
+    scrollToActiveVerlauf();
+}
+
+function renderArena(arena) {
+    const scoreA = sum(arena.pointsA);
+    const scoreB = sum(arena.pointsB);
+    const activeIndex = activeKehre(arena) - 1;
+    const entryIndex = activeKehreIndexForEntry();
+
+    const wSelected = state.selectedTeam === 'w' ? 'selected' : '';
+    const eSelected = state.selectedTeam === 'e' ? 'selected' : '';
+
+    return `
+    <div class="arena">
+        <div class="arena-top">
+            <div class="arena-title">🥌 Trainingsmodus PRO</div>
+            <div class="arena-hint">Mannschaft antippen oder direkt im Ziffernblock tippen &nbsp;|&nbsp; Kehre antippen zum Korrigieren</div>
+            <div class="pending-preview ${state.pendingDigit ? 'show' : ''}">Eingabe: ${state.pendingDigit ? state.pendingDigit.digit + '…' : ''}</div>
+        </div>
+
+        <div class="teams-row">
+            ${renderTeamColumn('w', 'Mannschaft W', '⚪', scoreA, arena.winsA, wSelected)}
+            ${renderTeamColumn('e', 'Mannschaft E', '🔴', scoreB, arena.winsB, eSelected)}
+        </div>
+
+        <div class="kehren-verlauf-panel" id="kehrenWrapper">
+            <h4><span>📊 Kehren-Verlauf</span><span style="font-weight:600;font-size:0.75rem;">Kehre ${activeIndex+1} / ${state.kehren}</span></h4>
+            <div class="kehren-verlauf-grid">
+                ${renderVerlaufGrid(arena, activeIndex, entryIndex)}
+            </div>
+        </div>
+
+        <div class="arena-footer">
+            <button class="gold" onclick="evaluateGame()">▶ Werten</button>
+            <button onclick="resetGame()">🔁 Neues Spiel</button>
+            <button onclick="deleteKehreEntry()" style="background:var(--red);">🗑 Kehre löschen</button>
+            <div class="footer-right">@Roland Koll · Tablet-Version</div>
+        </div>
+    </div>
+    `;
+}
+
+function renderTeamColumn(team, label, icon, score, wins, selectedClass) {
+    return `
+    <div class="team-column ${team === 'e' ? 'e' : 'w'}">
+        <div class="team-block ${team === 'e' ? 'e' : 'w'} ${selectedClass}" id="teamBlock-${team}" onclick="selectTeam('${team}')">
+            <div class="team-head">
+                <div class="team-label">${icon} ${label}</div>
+                <div class="team-wins-big">🏆 ${wins}</div>
+            </div>
+            <div class="team-score-big">${score}</div>
+        </div>
+        ${renderKeypad(team)}
+    </div>`;
+}
+
+function renderKeypad(team) {
+    const maxPoints = state.playerCount;
+    const digits = ['1','2','3','4','5','6','7','8','9','0'];
+    const btns = digits.map(d => {
+        const disabled = Number(d) > maxPoints && !(d === '0');
+        return `<button class="keypad-btn" ${disabled ? 'disabled' : ''} onclick="tapDigit('${team}','${d}')">${d}</button>`;
+    }).join('');
+    return `
+    <div class="keypad-panel">
+        <div class="keypad-grid">${btns}</div>
+    </div>`;
+}
+
+function renderVerlaufGrid(arena, activeIndex, entryIndex) {
+    let html = '';
+    for (let i = 0; i < state.kehren; i++) {
+        const aVal = arena.pointsA[i] !== null ? arena.pointsA[i] : '-';
+        const bVal = arena.pointsB[i] !== null ? arena.pointsB[i] : '-';
+        const isActive = i === activeIndex;
+        const isTarget = i === entryIndex && state.targetKehre !== null;
+        const isCompleted = arena.pointsA[i] !== null && arena.pointsB[i] !== null;
+
+        html += `
+        <div class="verlauf-item ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''} ${isTarget ? 'is-target' : ''}"
+             onclick="toggleKehreTarget(${i})" title="Antippen zum Korrigieren">
+            <div class="v-number">${i + 1}</div>
+            <div class="v-points"><span class="w">${aVal}</span><span class="e">${bVal}</span></div>
+        </div>`;
+    }
+    return html;
+}
+
+// ===== HELFER =====
+function createArena() {
+    return {
+        teamA: 'Mannschaft W',
+        teamB: 'Mannschaft E',
+        pointsA: Array(state.kehren).fill(null),
+        pointsB: Array(state.kehren).fill(null),
+        scorerA: Array(state.kehren).fill(null),
+        scorerB: Array(state.kehren).fill(null),
+        winsA: 0,
+        winsB: 0
+    };
+}
+
+function activeKehre(arena) {
+    for (let i = 0; i < state.kehren; i++) {
+        if (arena.pointsA[i] === null || arena.pointsB[i] === null) {
+            return i + 1;
+        }
+    }
+    return state.kehren;
+}
+
+function hasWinner(arena) {
+    return arena.winsA >= state.winsToChampion || arena.winsB >= state.winsToChampion;
+}
+
+function winnerName(arena) {
+    if (arena.winsA >= state.winsToChampion) return 'Mannschaft W';
+    if (arena.winsB >= state.winsToChampion) return 'Mannschaft E';
+    return '';
+}
+
+function sum(arr) {
+    return arr.reduce((a, b) => a + (b || 0), 0);
+}
+
+function checkAllKehrenFull(arena) {
+    for (let i = 0; i < state.kehren; i++) {
+        if (arena.pointsA[i] === null || arena.pointsB[i] === null) return false;
+    }
+    return true;
+}
+
+function scrollToActiveVerlauf() {
+    setTimeout(() => {
+        const wrapper = document.getElementById('kehrenWrapper');
+        if (!wrapper) return;
+        const activeItem = wrapper.querySelector('.verlauf-item.is-active');
+        if (activeItem) {
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const itemRect = activeItem.getBoundingClientRect();
+            const isVisible = itemRect.top >= wrapperRect.top + 10 && itemRect.bottom <= wrapperRect.bottom - 10;
+            if (!isVisible) {
+                activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+    }, 50);
+}
+
+function resetGame() {
+    if (state.isTrainingEnded) {
+        startNewTraining();
+        return;
+    }
+    const arena = state.arena;
+    arena.pointsA = Array(state.kehren).fill(null);
+    arena.pointsB = Array(state.kehren).fill(null);
+    arena.scorerA = Array(state.kehren).fill(null);
+    arena.scorerB = Array(state.kehren).fill(null);
+    arena.winsA = 0;
+    arena.winsB = 0;
+    state.selectedTeam = null;
+    state.targetKehre = null;
+    cancelPendingDigit();
+    updateKeyboardStatus();
+    render();
+    toast('Spiel neu gestartet');
+}
+
+function fullReset() {
+    state.arena = createArena();
+    state.selectedTeam = null;
+    state.targetKehre = null;
+    state.isTrainingEnded = false;
+    cancelPendingDigit();
+    updateKeyboardStatus();
+    document.getElementById('trainingEndedOverlay').classList.remove('show');
+    render();
+    toast('Kompletter Reset');
+}
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function toast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show';
+    if (type === 'warn') t.classList.add('warn');
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(() => {
+        t.classList.remove('show');
+        t.className = 'toast';
+    }, 3000);
+}
+
+// ===== EVENT-LISTENER (Header-Auswahl) =====
+document.getElementById('playerCount').addEventListener('change', function(e) {
+    if (state.isTrainingEnded) {
+        toast('Training ist beendet! „Neues Training starten“ antippen');
+        e.target.value = state.playerCount;
+        return;
+    }
+    state.playerCount = Number(e.target.value);
+    state.selectedTeam = null;
+    cancelPendingDigit();
+    updateKeyboardStatus();
+    render();
+    toast(`👥 ${state.playerCount} Spieler/Kehre`);
+});
+
+document.getElementById('kehrenSelect').addEventListener('change', function(e) {
+    if (state.isTrainingEnded) {
+        toast('Training ist beendet! „Neues Training starten“ antippen');
+        e.target.value = state.kehren;
+        return;
+    }
+    state.kehren = Number(e.target.value);
+    state.arena.pointsA = Array(state.kehren).fill(null);
+    state.arena.pointsB = Array(state.kehren).fill(null);
+    state.arena.scorerA = Array(state.kehren).fill(null);
+    state.arena.scorerB = Array(state.kehren).fill(null);
+    state.selectedTeam = null;
+    state.targetKehre = null;
+    cancelPendingDigit();
+    updateKeyboardStatus();
+    render();
+});
+
+document.getElementById('gamesSelect').addEventListener('change', function(e) {
+    if (state.isTrainingEnded) {
+        toast('Training ist beendet! „Neues Training starten“ antippen');
+        e.target.value = state.winsToChampion;
+        return;
+    }
+    state.winsToChampion = Number(e.target.value);
+    render();
+});
+
+// ===== HÖHENKORREKTUR =====
+function setCorrectHeight() {
+    const vh = window.innerHeight;
+    document.documentElement.style.setProperty('height', vh + 'px');
+    document.body.style.setProperty('height', vh + 'px');
+}
+
+window.addEventListener('resize', setCorrectHeight);
+window.addEventListener('orientationchange', function() {
+    setTimeout(setCorrectHeight, 300);
+});
+setCorrectHeight();
+
+// ===== INIT =====
+setupKeyboard();
+render();
 </script>
+
 </body>
 </html>

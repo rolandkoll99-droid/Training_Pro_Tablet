@@ -52,6 +52,70 @@ body{
     overflow: hidden;
 }
 
+.topbar{
+    position: sticky;
+    top: 0;
+    z-index: 501;
+    background:var(--bg-panel);
+    border-bottom:1px solid var(--line);
+    padding:6px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-shrink:0;
+    font-size:13px;
+    gap:10px;
+}
+.topbar .topbar-links{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.topbar a, .topbar button.linkish{
+    color:var(--text-dim);
+    text-decoration:none;
+    background:none;
+    border:1px solid var(--line);
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12.5px;
+    font-weight:600;
+}
+.topbar a:hover, .topbar button.linkish:hover{ color:var(--text-main); border-color:var(--text-dim); background:none; }
+
+/* ===== MANNSCHAFTSNAMEN (frei editierbar) ===== */
+.team-name-row{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    align-items:center;
+    padding:6px 14px;
+    background:var(--bg-panel);
+    border-bottom:1px solid var(--line);
+    flex-shrink:0;
+}
+.team-name-row label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:0.78rem;
+    font-weight:700;
+    color:var(--text-dim);
+}
+.team-name-row input{
+    background:#1c2734;
+    color:var(--text-main);
+    border:1px solid var(--line);
+    font-weight:700;
+    font-size:0.85rem;
+    padding:6px 10px;
+    width:180px;
+    max-width:40vw;
+}
+.team-name-row input:focus{
+    outline:2px solid var(--accent);
+}
+
 .header{
     position: sticky;
     top: 0;
@@ -504,6 +568,39 @@ button:active {
 .gold{ background:var(--gold); color:black; }
 .gold:active{ background:#f0c860; }
 
+/* ===== UNENTSCHIEDEN – KEHRE ERWEITERN (NEU) ===== */
+.tie-break-overlay {
+    position: fixed; inset:0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 20001;
+    backdrop-filter: blur(5px);
+}
+.tie-break-overlay.show { display: flex; }
+.tie-break-box {
+    background: white; color:#222;
+    border-radius: 30px;
+    padding: 40px;
+    max-width: 460px;
+    width: 90%;
+    text-align: center;
+}
+.tie-break-icon{ font-size:3rem; margin-bottom:6px; }
+.tie-break-box h2{ font-size:1.6rem; margin-bottom:8px; color:var(--green); }
+.tie-break-score{
+    font-size:2.2rem; font-weight:900; color:var(--gold);
+    background:#102417; display:inline-block; padding:6px 24px;
+    border-radius:16px; margin:10px 0;
+}
+.tie-break-hint{ font-size:0.9rem; color:#666; margin:14px 0 20px; line-height:1.5; }
+.tie-break-buttons{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.tie-break-buttons button{
+    padding:12px 22px; font-size:1rem; background:var(--green); color:white;
+    border-radius:14px; border:none; cursor:pointer; font-weight:700;
+}
+
 /* ===== RESPONSIVE =====
    Die beiden Mannschaftsspalten (Team + eigener Ziffernblock) bleiben bewusst bis zu
    sehr schmalen Breiten nebeneinander (Tablets im Hoch- wie Querformat) - anders als
@@ -521,9 +618,75 @@ button:active {
     .team-score-big{ font-size:2.6rem; }
     .kehren-verlauf-grid{ grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
 }
+
+/* ===== RASPBERRY-PI-TOUCHDISPLAY 1024×600 (Kiosk, Querformat) =====
+   Eigene Anpassung für das fest verbaute 1024×600-Display: die Breite reicht für die
+   2-spaltige Ansicht locker, aber die Höhe ist sehr knapp. Ohne diese Regeln rutschen
+   der Kehren-Verlauf und die Aktions-Buttons (Werten/Neues Spiel/Löschen) unten aus
+   dem sichtbaren Bereich. Greift bei kurzen, breiten Bildschirmen (min-width sorgt
+   dafür, dass schmale Hochformat-Handys weiter die Regeln oben oberhalb bekommen). */
+@media (max-height: 650px) and (min-width: 700px){
+    .topbar{ padding:3px 12px; font-size:11px; }
+    .topbar a, .topbar button.linkish{ padding:3px 10px; font-size:11px; }
+
+    .team-name-row{ padding:3px 12px; gap:10px; }
+    .team-name-row label{ font-size:0.7rem; gap:4px; }
+    .team-name-row input{ padding:3px 8px; font-size:0.75rem; width:140px; }
+
+    .header{ padding:4px 12px; gap:6px; }
+    .header h1{ font-size:1rem; }
+    .header h1::before{ font-size:8px; }
+    .header-controls{ gap:6px; }
+    .header-controls select{ padding:5px 8px; font-size:0.75rem; }
+    .keyboard-status{ padding:4px 9px; font-size:0.7rem; }
+    .header-controls button{ padding:5px 9px; font-size:0.8rem; }
+
+    .layout{ padding:6px; }
+    .arena{ padding:8px 10px; gap:6px; border-radius:16px; }
+    .arena-top{ gap:6px; }
+    .arena-title{ font-size:1rem; }
+    .arena-hint{ font-size:0.65rem; padding:3px 10px; }
+    .pending-preview{ font-size:0.7rem; padding:3px 10px; }
+
+    .teams-row{ grid-template-columns: 1fr 1fr; gap:8px; }
+    .team-block{ padding:8px; gap:6px; border-radius:14px; border-bottom-width:5px; box-shadow:0 3px 0 rgba(0,0,0,.25); }
+    .team-label{ font-size:1.05rem; }
+    .team-label .key-hint{ font-size:0.65rem; }
+    .team-wins-big{ font-size:0.9rem; padding:4px 12px; }
+    .team-score-big{ font-size:2.1rem; padding:0; text-shadow:none; }
+    .team-column{ gap:6px; }
+    .keypad-panel{ padding:6px; border-radius:14px; }
+    .keypad-grid{ gap:5px; }
+    .keypad-btn{ font-size:1rem; padding:11px 0; border-radius:10px; }
+
+    .kehren-verlauf-panel{ padding:8px 10px; border-radius:14px; gap:4px; }
+    .kehren-verlauf-panel h4{ font-size:0.7rem; }
+    .kehren-verlauf-grid{ grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap:6px; }
+    .verlauf-item{ padding:5px 3px; border-radius:9px; }
+    .verlauf-item .v-number{ font-size:0.65rem; }
+    .verlauf-item .v-points{ font-size:0.9rem; margin-top:1px; }
+
+    .arena-footer{ gap:6px; }
+    .arena-footer button{ padding:7px 14px; font-size:0.75rem; }
+    .arena-footer .footer-right{ font-size:0.6rem; }
+
+    .training-ended-box{ padding:24px; }
+    .tie-break-box{ padding:22px; }
+}
 </style>
 </head>
 <body>
+
+<div class="topbar">
+    <div class="topbar-links">
+        <a href="dashboard.html">🏠 Zurück zum Dashboard</a>
+    </div>
+</div>
+
+<div class="team-name-row">
+    <label>⚪ <input type="text" id="teamNameInputW" maxlength="24" placeholder="Mannschaftsname W" oninput="updateTeamName('w', this.value)"></label>
+    <label>🔴 <input type="text" id="teamNameInputE" maxlength="24" placeholder="Mannschaftsname E" oninput="updateTeamName('e', this.value)"></label>
+</div>
 
 <div class="header">
     <h1>Trainingsmodus Pro</h1>
@@ -572,24 +735,97 @@ button:active {
     </div>
 </div>
 
+<!-- Unentschieden – automatische Kehren-Verlängerung (NEU): es gibt kein Unentschieden zum Werten,
+     es werden automatisch immer 2 weitere Kehren gespielt, bis ein Sieger feststeht
+     (wie im echten Eisstocksport). Kein Klick nötig - die Verlängerung startet sofort,
+     dieses Fenster ist nur eine Info und schließt sich von selbst. -->
+<div class="tie-break-overlay" id="tieBreakOverlay">
+    <div class="tie-break-box">
+        <div class="tie-break-icon">🤝</div>
+        <h2>Unentschieden!</h2>
+        <div class="tie-break-score" id="tieBreakScore">0 : 0</div>
+        <p class="tie-break-hint" id="tieBreakHint">Nach allen Kehren steht es unentschieden. Es werden automatisch 2 weitere Kehren gespielt.</p>
+        <div class="tie-break-buttons">
+            <button onclick="closeTieBreakDialog()">Verstanden</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<!-- Eigenständiges Einzelprogramm für Tablets: kein Verweis auf das Dashboard/Portal,
-     keine Zugangssperre (requireGate()/requireLogin() werden bewusst nicht aufgerufen) -
-     sofort einsatzbereit, ohne weitere Module. -->
+<!-- Eigenständiges Einzelprogramm für Tablets: keine Zugangssperre
+     (requireGate()/requireLogin() werden bewusst nicht aufgerufen) - sofort
+     einsatzbereit, ohne Login. Ein einfacher Link zurück zum Dashboard ist
+     trotzdem vorhanden (siehe .topbar oben), damit man von hier aus wieder
+     ins Portal wechseln kann. -->
 <script>
 const PENDING_DIGIT_TIMEOUT = 650;
+
+// Mannschaftsnamen sind frei editierbar (Textfeld oben) statt fest "Mannschaft W/E" -
+// gleicher localStorage-Key wie 05_Trainingsmodus_Pro.html, damit ein einmal
+// vergebener Name auf beiden Varianten übernommen wird.
+const TEAM_NAMES_STORAGE_KEY = 'esv_grein_team_namen';
+const DEFAULT_TEAM_NAMES = { w: 'Mannschaft W', e: 'Mannschaft E' };
+
+function loadTeamNames() {
+    try {
+        const data = localStorage.getItem(TEAM_NAMES_STORAGE_KEY);
+        if (data) {
+            const parsed = JSON.parse(data);
+            if (parsed && typeof parsed.w === 'string' && typeof parsed.e === 'string') {
+                return {
+                    w: parsed.w.trim() || DEFAULT_TEAM_NAMES.w,
+                    e: parsed.e.trim() || DEFAULT_TEAM_NAMES.e
+                };
+            }
+        }
+    } catch (e) {}
+    return { w: DEFAULT_TEAM_NAMES.w, e: DEFAULT_TEAM_NAMES.e };
+}
+
+function saveTeamNames() {
+    try { localStorage.setItem(TEAM_NAMES_STORAGE_KEY, JSON.stringify(state.teamNames)); } catch (e) {}
+}
+
+function updateTeamName(team, value) {
+    state.teamNames[team] = value;
+    saveTeamNames();
+    render();
+}
+
+function syncTeamNameInputs() {
+    const wInput = document.getElementById('teamNameInputW');
+    const eInput = document.getElementById('teamNameInputE');
+    if (wInput && document.activeElement !== wInput) wInput.value = state.teamNames.w;
+    if (eInput && document.activeElement !== eInput) eInput.value = state.teamNames.e;
+}
+
+function refreshTeamNamesIfChanged() {
+    const fresh = loadTeamNames();
+    if (fresh.w === state.teamNames.w && fresh.e === state.teamNames.e) return;
+    state.teamNames = fresh;
+    syncTeamNameInputs();
+    render();
+}
+
+window.addEventListener('storage', function (e) {
+    if (e.key === TEAM_NAMES_STORAGE_KEY) refreshTeamNamesIfChanged();
+});
 
 // ===== STATE =====
 const state = {
     kehren: 6,
+    baseKehren: 6,                  // konfigurierte Kehren-Anzahl (Dropdown) - bei Unentschieden werden
+                                     // automatisch 2er-Blöcke an "kehren" angehängt, "baseKehren" bleibt
+                                     // die Grundeinstellung, auf die nach dem Spiel zurückgesetzt wird.
     winsToChampion: 2,
     playerCount: 4,
     arena: null,                    // wird gleich nach der Deklaration gesetzt (siehe unten)
     selectedTeam: null,             // 'w' | 'e' | null
     isTrainingEnded: false,
     targetKehre: null,              // manuell angetippte Kehre (Korrektur), sonst null = automatisch
-    pendingDigit: null              // { digit, timeoutId } für 2-stellige Eingabe (z.B. "10")
+    pendingDigit: null,             // { digit, timeoutId } für 2-stellige Eingabe (z.B. "10")
+    teamNames: loadTeamNames()
 };
 // createArena() liest state.kehren, daher erst NACH der obigen Deklaration aufrufen
 // (sonst "Cannot access 'state' before initialization").
@@ -867,18 +1103,46 @@ function evaluateGame() {
     const a = sum(arena.pointsA);
     const b = sum(arena.pointsB);
 
-    let gameResult = '';
-    if (a > b) {
-        arena.winsA++;
-        gameResult = `⚪ Mannschaft W gewinnt (${a}:${b})`;
-    } else if (b > a) {
-        arena.winsB++;
-        gameResult = `🔴 Mannschaft E gewinnt (${a}:${b})`;
-    } else {
-        gameResult = `Unentschieden (${a}:${b})`;
+    if (state.kehren === state.baseKehren) {
+        // Reguläres Spielende nach den eingestellten Kehren: Gesamtsumme entscheidet.
+        // Bei Gleichstand werden automatisch 2 weitere Kehren gespielt (siehe unten) -
+        // kein Unentschieden wird final gewertet.
+        if (a === b) {
+            extendKehren(a, b);
+            return;
+        }
+        const winnerCode = a > b ? 'w' : 'e';
+        toast(winnerCode === 'w' ? `⚪ ${state.teamNames.w} gewinnt (${a}:${b})` : `🔴 ${state.teamNames.e} gewinnt (${a}:${b})`);
+        finishGame(winnerCode);
+        return;
     }
-    toast(gameResult);
 
+    // Verlängerung aktiv: der zuletzt gespielte 2er-Block aus zusätzlichen Kehren
+    // entscheidet per Punktesumme - genau wie beim Grundspiel, nur eben für je
+    // 2 zusätzliche Kehren. Steht auch dieser Block unentschieden, werden automatisch
+    // wieder 2 weitere Kehren gespielt, bis eine Mannschaft einen Block gewinnt.
+    const blockA = (arena.pointsA[state.kehren - 2] || 0) + (arena.pointsA[state.kehren - 1] || 0);
+    const blockB = (arena.pointsB[state.kehren - 2] || 0) + (arena.pointsB[state.kehren - 1] || 0);
+
+    if (blockA === blockB) {
+        extendKehren(a, b);
+        return;
+    }
+
+    const winnerCode = blockA > blockB ? 'w' : 'e';
+    toast(winnerCode === 'w'
+        ? `⚪ ${state.teamNames.w} gewinnt die Verlängerung (${a}:${b})`
+        : `🔴 ${state.teamNames.e} gewinnt die Verlängerung (${a}:${b})`);
+    finishGame(winnerCode);
+}
+
+// Abschluss eines entschiedenen Spiels - erhöht den Sieg-Zähler, bereitet die
+// nächste Runde vor.
+function finishGame(winnerCode) {
+    const arena = state.arena;
+    if (winnerCode === 'w') arena.winsA++; else arena.winsB++;
+
+    state.kehren = state.baseKehren;
     arena.pointsA = Array(state.kehren).fill(null);
     arena.pointsB = Array(state.kehren).fill(null);
     arena.scorerA = Array(state.kehren).fill(null);
@@ -897,18 +1161,50 @@ function evaluateGame() {
     }
 }
 
+// ===== UNENTSCHIEDEN: AUTOMATISCHE VERLÄNGERUNG UM JE 2 KEHREN (NEU) =====
+// Fügt automatisch 2 weitere Kehren hinzu (kein Klick nötig) und zeigt kurz eine
+// Info-Meldung, die sich von selbst schließt.
+function extendKehren(a, b) {
+    const arena = state.arena;
+    arena.pointsA.push(null, null);
+    arena.pointsB.push(null, null);
+    arena.scorerA.push(null, null);
+    arena.scorerB.push(null, null);
+    state.kehren += 2;
+    updateKeyboardStatus();
+    showTieBreakDialog(a, b);
+    render();
+}
+
+function showTieBreakDialog(a, b) {
+    document.getElementById('tieBreakScore').textContent = `${a} : ${b}`;
+    const hintEl = document.getElementById('tieBreakHint');
+    if (hintEl) {
+        hintEl.textContent = `Unentschieden (${a}:${b}) – es werden automatisch 2 weitere Kehren (Kehre ${state.kehren - 1} und ${state.kehren}) gespielt.`;
+    }
+    document.getElementById('tieBreakOverlay').classList.add('show');
+    clearTimeout(state._tieBreakTimeout);
+    state._tieBreakTimeout = setTimeout(closeTieBreakDialog, 3000);
+}
+
+function closeTieBreakDialog() {
+    document.getElementById('tieBreakOverlay').classList.remove('show');
+    clearTimeout(state._tieBreakTimeout);
+}
+
 // ===== TRAINING BEENDEN =====
 function endTraining(arena) {
     state.isTrainingEnded = true;
     updateKeyboardStatus();
 
-    const winner = winnerName(arena);
+    const winnerKey = winnerTeamKey(arena);
+    const winner = winnerKey ? state.teamNames[winnerKey] : '';
     const overlay = document.getElementById('trainingEndedOverlay');
     const winnerEl = document.getElementById('winnerName');
     const summaryEl = document.getElementById('scoreSummary');
 
     winnerEl.textContent = winner;
-    winnerEl.style.color = winner === 'Mannschaft W' ? '#4caf50' : '#ff6b6b';
+    winnerEl.style.color = winnerKey === 'w' ? '#4caf50' : '#ff6b6b';
     summaryEl.textContent = `Siege: ${arena.winsA} : ${arena.winsB}`;
 
     overlay.classList.add('show');
@@ -928,6 +1224,7 @@ function startNewTraining() {
     overlay.classList.remove('show');
 
     state.isTrainingEnded = false;
+    state.kehren = state.baseKehren;
     state.arena = createArena();
     state.selectedTeam = null;
     state.targetKehre = null;
@@ -992,8 +1289,8 @@ function renderArena(arena) {
         </div>
 
         <div class="teams-row">
-            ${renderTeamColumn('w', 'Mannschaft W', '⚪', scoreA, arena.winsA, wSelected)}
-            ${renderTeamColumn('e', 'Mannschaft E', '🔴', scoreB, arena.winsB, eSelected)}
+            ${renderTeamColumn('w', state.teamNames.w, '⚪', scoreA, arena.winsA, wSelected)}
+            ${renderTeamColumn('e', state.teamNames.e, '🔴', scoreB, arena.winsB, eSelected)}
         </div>
 
         <div class="kehren-verlauf-panel" id="kehrenWrapper">
@@ -1086,10 +1383,12 @@ function hasWinner(arena) {
     return arena.winsA >= state.winsToChampion || arena.winsB >= state.winsToChampion;
 }
 
-function winnerName(arena) {
-    if (arena.winsA >= state.winsToChampion) return 'Mannschaft W';
-    if (arena.winsB >= state.winsToChampion) return 'Mannschaft E';
-    return '';
+// Liefert den Team-Schlüssel ('w'/'e') des Siegers, NICHT den (frei editierbaren)
+// Anzeigenamen - so bleibt die Sieger-Erkennung stabil, egal wie die Mannschaft heißt.
+function winnerTeamKey(arena) {
+    if (arena.winsA >= state.winsToChampion) return 'w';
+    if (arena.winsB >= state.winsToChampion) return 'e';
+    return null;
 }
 
 function sum(arr) {
@@ -1125,6 +1424,7 @@ function resetGame() {
         return;
     }
     const arena = state.arena;
+    state.kehren = state.baseKehren;
     arena.pointsA = Array(state.kehren).fill(null);
     arena.pointsB = Array(state.kehren).fill(null);
     arena.scorerA = Array(state.kehren).fill(null);
@@ -1140,6 +1440,7 @@ function resetGame() {
 }
 
 function fullReset() {
+    state.kehren = state.baseKehren;
     state.arena = createArena();
     state.selectedTeam = null;
     state.targetKehre = null;
@@ -1189,10 +1490,11 @@ document.getElementById('playerCount').addEventListener('change', function(e) {
 document.getElementById('kehrenSelect').addEventListener('change', function(e) {
     if (state.isTrainingEnded) {
         toast('Training ist beendet! „Neues Training starten“ antippen');
-        e.target.value = state.kehren;
+        e.target.value = state.baseKehren;
         return;
     }
     state.kehren = Number(e.target.value);
+    state.baseKehren = state.kehren;
     state.arena.pointsA = Array(state.kehren).fill(null);
     state.arena.pointsB = Array(state.kehren).fill(null);
     state.arena.scorerA = Array(state.kehren).fill(null);
@@ -1228,6 +1530,7 @@ window.addEventListener('orientationchange', function() {
 setCorrectHeight();
 
 // ===== INIT =====
+syncTeamNameInputs();
 setupKeyboard();
 render();
 </script>

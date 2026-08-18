@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
+
 :root{
     --green:#1f5e3a;
     --red:#b93a32;
@@ -28,6 +29,33 @@
 
     --w-color:#4caf50;
     --e-color:#ff6b6b;
+
+    /* ===== FLUIDE SKALIERUNG =====
+       Alle Abstände/Schriftgrößen unten basieren auf vmin (= 1% der jeweils
+       KLEINEREN Seite des Bildschirms - Breite oder Höhe, je nachdem was enger
+       ist). Dadurch skaliert das Layout automatisch sinnvoll, egal ob ein
+       Tablet quer (Breite ist meist ok, Höhe ist knapp - z.B. das fest
+       verbaute 1024x600-Kioskdisplay) oder hochkant (Breite ist knapp)
+       gehalten wird, und egal wie groß/klein/hochauflösend das jeweilige
+       Gerät ist - ohne feste Gerätestufen wie vorher. clamp(min, bevorzugt,
+       max) verhindert dabei, dass Text auf sehr großen oder sehr kleinen
+       Screens unleserlich klein bzw. unnötig riesig wird. */
+    --sp-1: clamp(3px, 0.55vmin, 8px);
+    --sp-2: clamp(6px, 1.1vmin, 14px);
+    --sp-3: clamp(8px, 1.7vmin, 20px);
+    --sp-4: clamp(10px, 2.3vmin, 28px);
+
+    --fs-2xs: clamp(9px, 1.15vmin, 12px);
+    --fs-xs: clamp(10px, 1.4vmin, 13px);
+    --fs-sm: clamp(11px, 1.6vmin, 15px);
+    --fs-body: clamp(12px, 1.9vmin, 17px);
+    --fs-md: clamp(14px, 2.3vmin, 20px);
+    --fs-lg: clamp(17px, 3vmin, 26px);
+    --fs-xl: clamp(21px, 3.8vmin, 34px);
+
+    --radius-sm: clamp(8px, 1.6vmin, 14px);
+    --radius-md: clamp(10px, 2.2vmin, 20px);
+    --radius-lg: clamp(14px, 3vmin, 24px);
 }
 
 *{
@@ -58,27 +86,27 @@ body{
     z-index: 501;
     background:var(--bg-panel);
     border-bottom:1px solid var(--line);
-    padding:6px 14px;
+    padding:var(--sp-1) var(--sp-3);
     display:flex;
     justify-content:space-between;
     align-items:center;
     flex-shrink:0;
-    font-size:13px;
-    gap:10px;
+    font-size:var(--fs-xs);
+    gap:var(--sp-2);
 }
 .topbar .topbar-links{
     display:flex;
     align-items:center;
-    gap:10px;
+    gap:var(--sp-2);
 }
 .topbar a, .topbar button.linkish{
     color:var(--text-dim);
     text-decoration:none;
     background:none;
     border:1px solid var(--line);
-    padding:6px 12px;
+    padding:var(--sp-1) var(--sp-2);
     border-radius:20px;
-    font-size:12.5px;
+    font-size:var(--fs-xs);
     font-weight:600;
 }
 .topbar a:hover, .topbar button.linkish:hover{ color:var(--text-main); border-color:var(--text-dim); background:none; }
@@ -86,10 +114,10 @@ body{
 /* ===== MANNSCHAFTSNAMEN (frei editierbar) ===== */
 .team-name-row{
     display:flex;
-    gap:16px;
+    gap:var(--sp-3);
     flex-wrap:wrap;
     align-items:center;
-    padding:6px 14px;
+    padding:var(--sp-1) var(--sp-3);
     background:var(--bg-panel);
     border-bottom:1px solid var(--line);
     flex-shrink:0;
@@ -97,8 +125,8 @@ body{
 .team-name-row label{
     display:flex;
     align-items:center;
-    gap:6px;
-    font-size:0.78rem;
+    gap:var(--sp-1);
+    font-size:var(--fs-xs);
     font-weight:700;
     color:var(--text-dim);
 }
@@ -107,9 +135,9 @@ body{
     color:var(--text-main);
     border:1px solid var(--line);
     font-weight:700;
-    font-size:0.85rem;
-    padding:6px 10px;
-    width:180px;
+    font-size:var(--fs-sm);
+    padding:var(--sp-1) var(--sp-2);
+    width:clamp(100px, 16vw, 180px);
     max-width:40vw;
 }
 .team-name-row input:focus{
@@ -123,12 +151,12 @@ body{
     background:var(--bg-panel);
     border-bottom:1px solid var(--line);
     color:var(--text-main);
-    padding:8px 14px;
+    padding:var(--sp-2) var(--sp-3);
     display:flex;
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
-    gap:10px;
+    gap:var(--sp-2);
     flex-shrink:0;
 }
 
@@ -136,7 +164,7 @@ body{
     font-family:var(--font-display);
     letter-spacing:0.03em;
     text-transform:uppercase;
-    font-size:1.4rem;
+    font-size:var(--fs-lg);
     color:var(--text-main);
 }
 .header h1::before{
@@ -145,14 +173,14 @@ body{
     font-family:var(--font-body);
     text-transform:uppercase;
     letter-spacing:0.14em;
-    font-size:10px;
+    font-size:clamp(7px, 1vmin, 10px);
     color:var(--accent);
     font-weight:700;
 }
 
 .header-controls{
     display:flex;
-    gap:8px;
+    gap:var(--sp-1);
     flex-wrap:wrap;
     align-items:center;
 }
@@ -162,8 +190,8 @@ select,
 input{
     border:none;
     border-radius:20px;
-    padding:9px 13px;
-    font-size:0.95rem;
+    padding:var(--sp-1) var(--sp-2);
+    font-size:var(--fs-body);
     touch-action: manipulation;
     font-family:inherit;
 }
@@ -189,13 +217,18 @@ button:active {
     color:var(--text-main);
     border:1px solid var(--line);
     font-weight:600;
-    font-size:0.85rem;
-    padding:8px 10px;
+    font-size:var(--fs-xs);
+    padding:var(--sp-1) var(--sp-2);
+}
+
+.header-controls button{
+    padding:var(--sp-1) var(--sp-2);
+    font-size:var(--fs-sm);
 }
 
 .keyboard-status {
-    font-size: 0.8rem;
-    padding: 6px 12px;
+    font-size: var(--fs-xs);
+    padding: var(--sp-1) var(--sp-2);
     border-radius: 20px;
     background: #1c2734;
     color: var(--text-main);
@@ -217,7 +250,7 @@ button:active {
 
 .layout{
     flex: 1;
-    padding:14px;
+    padding:var(--sp-3);
     overflow: hidden;
     min-height: 0;
 }
@@ -229,14 +262,14 @@ button:active {
     height:100%;
     background:linear-gradient(165deg,#132a1d,#0a1810);
     border:1px solid rgba(255,255,255,0.06);
-    border-radius:24px;
+    border-radius:var(--radius-lg);
     overflow:hidden;
     box-shadow:0 10px 40px rgba(0,0,0,.4);
     display:flex;
     flex-direction:column;
     margin: 0 auto;
-    padding:16px 20px;
-    gap:12px;
+    padding:var(--sp-3) var(--sp-4);
+    gap:var(--sp-2);
     color:#fff;
 }
 
@@ -245,31 +278,31 @@ button:active {
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
-    gap:10px;
+    gap:var(--sp-2);
     flex-shrink:0;
 }
 
 .arena-title{
     font-family:var(--font-display);
-    font-size:1.6rem;
+    font-size:var(--fs-xl);
     font-weight:900;
     color:var(--gold);
     letter-spacing:1px;
 }
 
 .arena-hint{
-    font-size:0.8rem;
+    font-size:var(--fs-xs);
     color:#8aa89a;
     background:rgba(255,255,255,0.05);
-    padding:6px 14px;
+    padding:var(--sp-1) var(--sp-3);
     border-radius:20px;
     border:1px solid rgba(255,255,255,0.06);
 }
 
 .pending-preview{
-    font-size:0.85rem;
+    font-size:var(--fs-xs);
     font-weight:800;
-    padding:6px 14px;
+    padding:var(--sp-1) var(--sp-3);
     border-radius:20px;
     background:var(--gold);
     color:#332400;
@@ -277,11 +310,14 @@ button:active {
 }
 .pending-preview.show{ display:inline-block; animation: blink 0.8s ease-in-out infinite; }
 
-/* ===== TEAMS ROW ===== */
+/* ===== TEAMS ROW =====
+   Bleibt bewusst bis zu sehr schmalen Breiten 2-spaltig (Tablets im Quer- wie
+   Hochformat) - erst wenn das Gerät hochkant gehalten wird oder wirklich eng
+   ist (Media Query weiter unten), wird auf eine Spalte umgeschaltet. */
 .teams-row{
     display:grid;
     grid-template-columns: 1fr 1fr;
-    gap:16px;
+    gap:var(--sp-3);
     flex-shrink:0;
     align-items:start;
 }
@@ -289,29 +325,29 @@ button:active {
 .team-column{
     display:flex;
     flex-direction:column;
-    gap:10px;
+    gap:var(--sp-2);
 }
 
 /* ===== ZIFFERNBLOCK (Tablet-Touch-Eingabe je Mannschaft) ===== */
 .keypad-panel{
     background:#0a1810;
-    border-radius:18px;
-    padding:10px;
+    border-radius:var(--radius-md);
+    padding:var(--sp-2);
     border:1px solid rgba(255,255,255,0.06);
 }
 .keypad-grid{
     display:grid;
     grid-template-columns: repeat(5, 1fr);
-    gap:8px;
+    gap:clamp(4px, 0.9vmin, 8px);
 }
 .keypad-btn{
     background:#14261c;
     color:var(--text-main);
     border:1px solid rgba(255,255,255,0.08);
-    border-radius:14px;
-    font-size:1.5rem;
+    border-radius:clamp(8px, 1.6vmin, 14px);
+    font-size:clamp(0.9rem, 2.6vmin, 1.5rem);
     font-weight:800;
-    padding:16px 0;
+    padding:clamp(8px, 1.8vmin, 16px) 0;
     cursor:pointer;
     touch-action:manipulation;
     transition: transform 0.1s, background 0.15s;
@@ -324,13 +360,13 @@ button:active {
 
 .team-block{
     background:#0f1f17;
-    border-radius:20px;
-    padding:16px;
-    border-bottom:8px solid var(--w-color);
-    box-shadow:0 6px 0 rgba(0,0,0,.25);
+    border-radius:var(--radius-md);
+    padding:var(--sp-3);
+    border-bottom:clamp(4px, 0.9vmin, 8px) solid var(--w-color);
+    box-shadow:0 clamp(3px, 0.7vmin, 6px) 0 rgba(0,0,0,.25);
     display:flex;
     flex-direction:column;
-    gap:10px;
+    gap:var(--sp-2);
     transition: all 0.25s ease;
     cursor:pointer;
 }
@@ -365,55 +401,57 @@ button:active {
 
 .team-label{
     font-weight:900;
-    font-size:1.7rem;
+    font-size:var(--fs-lg);
     letter-spacing:0.5px;
 }
-.team-label .key-hint{ font-size:0.78rem; color:#8aa89a; font-weight:600; display:block; }
+.team-label .key-hint{ font-size:var(--fs-2xs); color:#8aa89a; font-weight:600; display:block; }
 
 .team-wins-big {
-    font-size: 1.3rem;
+    font-size: var(--fs-md);
     background: rgba(255,255,255,0.08);
     color: var(--gold);
-    padding: 7px 18px;
+    padding: clamp(4px, 0.9vmin, 7px) clamp(10px, 2vmin, 18px);
     border-radius: 40px;
     font-weight: 800;
     border: 1px solid rgba(255,223,140,0.2);
     white-space:nowrap;
 }
 
-/* Ergebnis-Anzeige: auf dem Tablet etwas kompakter als am Zuschauermonitor,
-   damit unter jeder Mannschaft noch genug Platz für den Ziffernblock bleibt. */
+/* Ergebnis-Anzeige: skaliert über vmin am stärksten mit, weil sie das visuell
+   wichtigste Element ist - bleibt auf sehr kleinen Screens trotzdem noch
+   lesbar (Untergrenze) und wird auf großen Monitoren nicht unnötig riesig
+   (Obergrenze). */
 .team-score-big {
-    font-size: clamp(3.5rem, 11vh, 7rem);
+    font-size: clamp(2.4rem, 10vmin, 7rem);
     font-weight: 900;
     color: var(--w-color);
     line-height: 1;
     text-shadow: 0 4px 30px rgba(76,175,80,0.35);
     text-align:center;
-    padding: 4px 0;
+    padding: clamp(2px, 0.5vmin, 4px) 0;
 }
 .team-block.e .team-score-big { color: var(--e-color); text-shadow: 0 4px 20px rgba(255,107,107,0.3); }
 
 /* ===== EINGABE-HINWEIS (externes Tastenfeld, kein Bildschirm-Ziffernblock) ===== */
 .input-hint-panel{
     background:#0a1810;
-    border-radius:20px;
-    padding:14px;
+    border-radius:var(--radius-lg);
+    padding:var(--sp-3);
     border:1px solid rgba(255,255,255,0.06);
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:var(--sp-2);
     align-items:center;
     justify-content:center;
     text-align:center;
 }
 .input-hint-status{
-    font-size:1rem;
+    font-size:var(--fs-body);
     font-weight:800;
     color:#eef2f6;
 }
 .input-hint-keys{
-    font-size:0.78rem;
+    font-size:var(--fs-xs);
     color:#8aa89a;
     line-height:1.6;
 }
@@ -430,19 +468,19 @@ button:active {
 /* ===== KEHREN-VERLAUF (unterer Bereich, etwas wichtiger als die Historie) ===== */
 .kehren-verlauf-panel{
     background:#0a1810;
-    border-radius:18px;
-    padding:12px 16px;
+    border-radius:var(--radius-md);
+    padding:var(--sp-2) var(--sp-3);
     border:1px solid rgba(255,255,255,0.06);
     flex:1.3 1 0;
     min-height:0;
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:var(--sp-1);
 }
 
 .kehren-verlauf-panel h4{
     color:#8aa89a;
-    font-size:0.85rem;
+    font-size:var(--fs-xs);
     text-transform:uppercase;
     letter-spacing:1px;
     font-weight:700;
@@ -454,8 +492,8 @@ button:active {
 
 .kehren-verlauf-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap:10px;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(56px, 9vmin, 90px), 1fr));
+    gap:clamp(5px, 1vmin, 10px);
     overflow-y:auto;
     padding:2px;
     min-height:0;
@@ -463,8 +501,8 @@ button:active {
 
 .verlauf-item{
     background:#14261c;
-    border-radius:12px;
-    padding:8px 4px;
+    border-radius:clamp(8px, 1.4vmin, 12px);
+    padding:clamp(4px, 0.9vmin, 8px) clamp(3px, 0.6vmin, 4px);
     text-align:center;
     border:2px solid rgba(255,255,255,0.06);
     cursor:pointer;
@@ -484,18 +522,18 @@ button:active {
     background:#241f0d;
 }
 
-.verlauf-item .v-number{ font-weight:700; color:#8aa89a; font-size:0.8rem; }
+.verlauf-item .v-number{ font-weight:700; color:#8aa89a; font-size:clamp(0.6rem, 1.3vmin, 0.8rem); }
 .verlauf-item .v-points{
     font-weight:900;
     display:flex;
     justify-content:space-around;
-    font-size:1.15rem;
+    font-size:clamp(0.8rem, 2vmin, 1.15rem);
     margin-top:2px;
 }
 .verlauf-item .v-points .w{ color:var(--w-color); }
 .verlauf-item .v-points .e{ color:var(--e-color); }
 .verlauf-item .v-scorer{
-    font-size:0.6rem;
+    font-size:clamp(0.55rem, 1vmin, 0.6rem);
     color:#65796d;
     margin-top:2px;
     white-space:nowrap;
@@ -508,16 +546,16 @@ button:active {
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:10px;
+    gap:var(--sp-1);
     flex-wrap:wrap;
     flex-shrink:0;
 }
 .arena-footer button{
-    padding:10px 18px;
-    font-size:0.85rem;
+    padding:clamp(6px, 1.4vmin, 10px) clamp(12px, 2.4vmin, 18px);
+    font-size:var(--fs-xs);
 }
 .arena-footer .footer-right {
-    font-size:0.72rem;
+    font-size:clamp(0.55rem, 1vmin, 0.72rem);
     color:#65796d;
     margin-left:auto;
 }
@@ -536,7 +574,7 @@ button:active {
 .training-ended-box {
     background: white; color:#222;
     border-radius: 30px;
-    padding: 50px;
+    padding: clamp(20px, 5vmin, 50px);
     max-width: 500px;
     width: 90%;
     text-align: center;
@@ -582,7 +620,7 @@ button:active {
 .tie-break-box {
     background: white; color:#222;
     border-radius: 30px;
-    padding: 40px;
+    padding: clamp(18px, 4vmin, 40px);
     max-width: 460px;
     width: 90%;
     text-align: center;
@@ -601,77 +639,16 @@ button:active {
     border-radius:14px; border:none; cursor:pointer; font-weight:700;
 }
 
-/* ===== RESPONSIVE =====
-   Die beiden Mannschaftsspalten (Team + eigener Ziffernblock) bleiben bewusst bis zu
-   sehr schmalen Breiten nebeneinander (Tablets im Hoch- wie Querformat) - anders als
-   beim ursprünglichen Zuschauermonitor-Layout gibt es hier keine seitlichen
-   Aufstellung-Panels mehr, die bei wenig Platz zuerst weichen müssten. */
-@media (max-width: 900px){
-    .team-score-big{ font-size:3.2rem; }
-    .keypad-btn{ font-size:1.2rem; padding:12px 0; }
-}
-
-@media (max-width: 620px){
+/* ===== RESPONSIVE-STRUKTUR =====
+   Die feste Skalierung oben (clamp()+vmin) deckt bereits jede Bildschirmgröße
+   fließend ab - hier geht es nur noch um die STRUKTUR: Wann werden die beiden
+   Mannschaftsspalten untereinander statt nebeneinander angezeigt? Das hängt
+   nicht von der reinen Größe ab (ein großes Tablet im Hochformat ist trotzdem
+   schmal), sondern vom Seitenverhältnis - deshalb orientation:portrait statt
+   einer festen Pixel-Schwelle. Zusätzlich eine schmale Breite als Fallback für
+   sehr schmale Fenster im Querformat (z.B. Splitscreen). */
+@media (orientation: portrait), (max-width: 640px){
     .teams-row{ grid-template-columns: 1fr; }
-    .header h1{ font-size:1.1rem; }
-    .arena{ padding:10px; border-radius:16px; }
-    .team-score-big{ font-size:2.6rem; }
-    .kehren-verlauf-grid{ grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
-}
-
-/* ===== RASPBERRY-PI-TOUCHDISPLAY 1024×600 (Kiosk, Querformat) =====
-   Eigene Anpassung für das fest verbaute 1024×600-Display: die Breite reicht für die
-   2-spaltige Ansicht locker, aber die Höhe ist sehr knapp. Ohne diese Regeln rutschen
-   der Kehren-Verlauf und die Aktions-Buttons (Werten/Neues Spiel/Löschen) unten aus
-   dem sichtbaren Bereich. Greift bei kurzen, breiten Bildschirmen (min-width sorgt
-   dafür, dass schmale Hochformat-Handys weiter die Regeln oben oberhalb bekommen). */
-@media (max-height: 650px) and (min-width: 700px){
-    .topbar{ padding:3px 12px; font-size:11px; }
-    .topbar a, .topbar button.linkish{ padding:3px 10px; font-size:11px; }
-
-    .team-name-row{ padding:3px 12px; gap:10px; }
-    .team-name-row label{ font-size:0.7rem; gap:4px; }
-    .team-name-row input{ padding:3px 8px; font-size:0.75rem; width:140px; }
-
-    .header{ padding:4px 12px; gap:6px; }
-    .header h1{ font-size:1rem; }
-    .header h1::before{ font-size:8px; }
-    .header-controls{ gap:6px; }
-    .header-controls select{ padding:5px 8px; font-size:0.75rem; }
-    .keyboard-status{ padding:4px 9px; font-size:0.7rem; }
-    .header-controls button{ padding:5px 9px; font-size:0.8rem; }
-
-    .layout{ padding:6px; }
-    .arena{ padding:8px 10px; gap:6px; border-radius:16px; }
-    .arena-top{ gap:6px; }
-    .arena-title{ font-size:1rem; }
-    .arena-hint{ font-size:0.65rem; padding:3px 10px; }
-    .pending-preview{ font-size:0.7rem; padding:3px 10px; }
-
-    .teams-row{ grid-template-columns: 1fr 1fr; gap:8px; }
-    .team-block{ padding:8px; gap:6px; border-radius:14px; border-bottom-width:5px; box-shadow:0 3px 0 rgba(0,0,0,.25); }
-    .team-label{ font-size:1.05rem; }
-    .team-label .key-hint{ font-size:0.65rem; }
-    .team-wins-big{ font-size:0.9rem; padding:4px 12px; }
-    .team-score-big{ font-size:2.1rem; padding:0; text-shadow:none; }
-    .team-column{ gap:6px; }
-    .keypad-panel{ padding:6px; border-radius:14px; }
-    .keypad-grid{ gap:5px; }
-    .keypad-btn{ font-size:1rem; padding:11px 0; border-radius:10px; }
-
-    .kehren-verlauf-panel{ padding:8px 10px; border-radius:14px; gap:4px; }
-    .kehren-verlauf-panel h4{ font-size:0.7rem; }
-    .kehren-verlauf-grid{ grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap:6px; }
-    .verlauf-item{ padding:5px 3px; border-radius:9px; }
-    .verlauf-item .v-number{ font-size:0.65rem; }
-    .verlauf-item .v-points{ font-size:0.9rem; margin-top:1px; }
-
-    .arena-footer{ gap:6px; }
-    .arena-footer button{ padding:7px 14px; font-size:0.75rem; }
-    .arena-footer .footer-right{ font-size:0.6rem; }
-
-    .training-ended-box{ padding:24px; }
-    .tie-break-box{ padding:22px; }
 }
 </style>
 </head>

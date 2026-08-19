@@ -226,6 +226,15 @@ button:active {
     font-size:var(--fs-sm);
 }
 
+/* Vollbild-Button: deutlich größer/quadratischer als die übrigen Header-Buttons,
+   da das ⛶-Symbol bei reiner Touch-Bedienung auf dem Tablet sonst zu klein und
+   schwer zu treffen/erkennen ist. */
+.fullscreen-btn{
+    font-size:clamp(20px, 3.4vmin, 30px) !important;
+    line-height:1;
+    padding:clamp(4px, 0.9vmin, 8px) clamp(10px, 1.8vmin, 16px) !important;
+}
+
 .keyboard-status {
     font-size: var(--fs-xs);
     padding: var(--sp-1) var(--sp-2);
@@ -288,15 +297,6 @@ button:active {
     font-weight:900;
     color:var(--gold);
     letter-spacing:1px;
-}
-
-.arena-hint{
-    font-size:var(--fs-xs);
-    color:#8aa89a;
-    background:rgba(255,255,255,0.05);
-    padding:var(--sp-1) var(--sp-3);
-    border-radius:20px;
-    border:1px solid rgba(255,255,255,0.06);
 }
 
 .pending-preview{
@@ -407,7 +407,7 @@ button:active {
 .team-label .key-hint{ font-size:var(--fs-2xs); color:#8aa89a; font-weight:600; display:block; }
 
 .team-wins-big {
-    font-size: var(--fs-md);
+    font-size: clamp(19px, 3.4vmin, 30px);
     background: rgba(255,255,255,0.08);
     color: var(--gold);
     padding: clamp(4px, 0.9vmin, 7px) clamp(10px, 2vmin, 18px);
@@ -693,7 +693,7 @@ button:active {
             <option value="6">6 Spieler/Kehre</option>
         </select>
 
-        <button onclick="toggleFullscreen()" title="Vollbild ein/aus">⛶</button>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Vollbild ein/aus">⛶</button>
         <button onclick="fullReset()" style="background:#b93a32;" title="Kompletter Reset">↺</button>
     </div>
 </div>
@@ -1234,7 +1234,7 @@ function updateKeyboardStatus() {
         statusEl.textContent = `${teamLabel} ausgewählt${targetLabel} – Punkte eingeben`;
         statusEl.className = 'keyboard-status ' + (state.selectedTeam === 'w' ? 'team-w' : 'team-e');
     } else {
-        statusEl.textContent = '🔑 Bereit - Mannschaft antippen oder Ziffernblock verwenden';
+        statusEl.textContent = '🔑 Bereit';
         statusEl.className = 'keyboard-status';
     }
 }
@@ -1261,7 +1261,6 @@ function renderArena(arena) {
     <div class="arena">
         <div class="arena-top">
             <div class="arena-title">🥌 Trainingsmodus PRO</div>
-            <div class="arena-hint">Mannschaft antippen oder direkt im Ziffernblock tippen &nbsp;|&nbsp; Kehre antippen zum Korrigieren</div>
             <div class="pending-preview ${state.pendingDigit ? 'show' : ''}">Eingabe: ${state.pendingDigit ? state.pendingDigit.digit + '…' : ''}</div>
         </div>
 
